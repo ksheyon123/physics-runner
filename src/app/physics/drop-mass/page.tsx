@@ -6,10 +6,12 @@ import * as THREE from "three";
 
 import { useCamera } from "@/hooks/useCamera";
 import { useRenederer } from "@/hooks/useRenderer";
+import { useMesh } from "@/hooks/useMesh";
 
 const Page = () => {
   const { createCamera } = useCamera();
   const { createRenderer, createScene } = useRenederer();
+  const { testor } = useMesh();
 
   const canvasRef = useRef<HTMLDivElement>();
 
@@ -35,6 +37,7 @@ const Page = () => {
       };
       return () => cancelAnimationFrame(id);
     }
+    testor();
   }, []);
 
   return <div ref={canvasRef as RefObject<HTMLDivElement>} />;

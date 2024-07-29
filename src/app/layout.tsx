@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Providers } from "@/contexts/Providers";
 
 export default function RootLayout({
   children,
@@ -14,7 +11,9 @@ export default function RootLayout({
       <head>
         <script src="https://kit.fontawesome.com/3062cd7a80.js" />
       </head>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
