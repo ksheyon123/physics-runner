@@ -1,9 +1,16 @@
+import { useRef } from "react";
 import * as THREE from "three";
 
 export const useMesh = () => {
   const dt = 1 / 6; // [s] (10 times faster)
   const g = -9.81; // [m/s**2]
   const mass = 1; // [kg]
+
+  const specsRef = useRef<any>({
+    dt: 1 / 6, // [s]
+    mass: 1, // [kg]
+    cor: 1, // coefficient of restitution (0 ~ 1)
+  });
 
   /**
    *
@@ -104,15 +111,19 @@ export const useMesh = () => {
   };
 
   // pe = mgh
-  const potential = () => {};
+  const potential = (vel: THREE.Vector3) => {};
 
   // v ** 2 - v0 ** 2 = 2gh
-  const kinetic = () => {};
+  const kinetic = (vel: THREE.Vector3) => {
+    const h = Math.pow(vel.y, 2) / (2 * -9.81);
+  };
 
-  // Drag Coefficient = 0.47
+  // Drag Coefficient = 0.47, cube = 1.05
   // ρ (Air density) = 1.225 [kg / m3]
   //mg= 1/2 * Cd * ρ * A * v ** 2 > 종단 속도
   const terminalVelocity = () => {};
+
+  // coefficient of restitution (반발계수)
 
   return {
     createMesh,

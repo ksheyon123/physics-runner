@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { useCamera } from "@/hooks/useCamera";
 import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
+import styled from "styled-components";
 
 const Page = () => {
   const { createCamera } = useCamera();
@@ -31,7 +32,10 @@ const Page = () => {
       const camera = createCamera();
       camera.position.set(0, 0, 200);
       camera.lookAt(0, 0, 0);
-      const renderer = createRenderer();
+      const renderer = createRenderer(
+        window.innerWidth,
+        window.innerHeight - 80
+      );
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const mesh = createMesh();
       mesh.position.set(0, 100, 0);
@@ -69,7 +73,19 @@ const Page = () => {
     }
   }, [isMounted]);
 
-  return <div ref={canvasRef as RefObject<HTMLDivElement>} />;
+  return (
+    <StyledDrawer
+      $width={window.innerWidth}
+      $height={window.innerHeight - 80}
+      ref={canvasRef as RefObject<HTMLDivElement>}
+    />
+  );
 };
+
+const StyledDrawer = styled.div<{ $width?: number; $height?: number }>`
+  position: relative;
+  width: ${(props) => `${props.$width}px` || "100%"};
+  height: ${(props) => `${props.$height}px` || "100%"};
+`;
 
 export default Page;

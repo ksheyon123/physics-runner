@@ -4,10 +4,6 @@ import React, { ReactNode } from "react";
 
 import { ThemeProvider } from "styled-components";
 
-export interface IProps {
-  children: ReactNode;
-}
-
 export const Providers = ({
   children,
 }: Readonly<{
