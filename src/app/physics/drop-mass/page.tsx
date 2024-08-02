@@ -12,8 +12,15 @@ import styled from "styled-components";
 const Page = () => {
   const { createCamera } = useCamera();
   const { createRenderer, createScene } = useRenederer();
-  const { createMesh, calForce, calAcceleration, calVelocity, calCoordinate } =
-    useMesh();
+  const {
+    createMesh,
+    calForce,
+    calAcceleration,
+    calVelocity,
+    calCoordinate,
+    collisionCheck,
+    kinetic,
+  } = useMesh();
 
   const canvasRef = useRef<HTMLDivElement>();
 
@@ -37,9 +44,17 @@ const Page = () => {
         window.innerHeight - 80
       );
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
-      const mesh = createMesh();
+      const mesh = createMesh(0, 0, 0, 0xff0000);
       mesh.position.set(0, 100, 0);
       scene.add(mesh);
+
+      const plane = createMesh(100, 100, 1);
+      plane.position.set(0, 0, 0);
+      plane.rotation.x = 90;
+
+      const plane2 = createMesh(100, 100, 1);
+      plane2.position.set(10, 0, 0);
+      scene.add(plane);
 
       const vel = new THREE.Vector3();
       let id: any;
@@ -50,25 +65,23 @@ const Page = () => {
         const acc = calAcceleration(force);
         const newVel = calVelocity(vel, acc);
         const newP = calCoordinate(prevPosition, newVel);
-        if (newP.y <= 0) {
-          newP.set(0, 0, 0);
-          newVel.set(0, 0, 0);
+        if (collisionCheck(mesh, newP)) {
+          const { x, y, z } = kinetic(newVel);
+          // newP.set(0, 0, 0);
+          newVel.set(x, y, z);
+        } else if (newP.y <= 0) {
+          const { x, y, z } = kinetic(newVel);
+          newVel.set(x, y, z);
         }
         mesh.position.set(newP.x, newP.y, newP.z);
         vel.set(newVel.x, newVel.y, newVel.z);
         renderer.render(scene, camera);
       };
 
-      //   let d = setInterval(() => {
-      //     clearInterval(d);
-      //     cancelAnimationFrame(id);
-      //     animate();
-      //   }, 5000);
       animate();
 
       return () => {
         cancelAnimationFrame(id);
-        // clearInterval(d);
       };
     }
   }, [isMounted]);

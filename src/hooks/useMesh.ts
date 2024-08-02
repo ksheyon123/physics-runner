@@ -6,6 +6,14 @@ export const useMesh = () => {
   const g = -9.81; // [m/s**2]
   const mass = 1; // [kg]
 
+  const meshesRef = useRef<{
+    [key: string]: THREE.Mesh<
+      any,
+      THREE.MeshBasicMaterial,
+      THREE.Object3DEventMap
+    >;
+  }>({});
+
   const specsRef = useRef<any>({
     dt: 1 / 6, // [s]
     mass: 1, // [kg]
@@ -16,10 +24,19 @@ export const useMesh = () => {
    *
    * @returns {THREE.Mesh} Mesh Object
    */
-  const createMesh = () => {
-    const geometry = new THREE.BoxGeometry(5, 5, 5);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const createMesh = (
+    width?: number,
+    height?: number,
+    depth?: number,
+    color?: number
+  ) => {
+    const geometry = new THREE.BoxGeometry(width || 5, height || 5, depth || 5);
+    const material = new THREE.MeshBasicMaterial({ color: color || 0x000000 });
     const cube = new THREE.Mesh(geometry, material);
+    meshesRef.current = {
+      ...meshesRef.current,
+      [cube.uuid]: cube,
+    };
     return cube;
   };
 
@@ -78,36 +95,56 @@ export const useMesh = () => {
     return newPosition;
   };
 
-  const collide = (
-    mesh: THREE.Mesh,
-    prevPosition: THREE.Vector3,
-    direction: THREE.Vector3
-  ) => {
-    let collidableMeshList: any[] = [];
+  const collisionCheck = (mesh: THREE.Mesh, newPosition: THREE.Vector3) => {
+    // Get a list of collidable meshes, excluding the current mesh
+    let collidableMeshList = Object.values(meshesRef.current).filter(
+      (el: any) => mesh.uuid !== el.uuid
+    );
+    const cloneMeshWithNewPosition = mesh
+      .clone()
+      .position.set(newPosition.x, newPosition.y, newPosition.z);
+    // Get the positions attribute from the geometry
+    const positionAttribute = mesh.geometry.attributes.position;
+
+    // Iterate through each vertex of the mesh
     for (
-      var vertexIndex = 0;
-      vertexIndex < mesh.geometry.attributes.position.array.length;
+      let vertexIndex = 0;
+      vertexIndex < positionAttribute.count;
       vertexIndex++
     ) {
-      var localVertex = new THREE.Vector3()
-        .fromBufferAttribute(mesh.geometry.attributes.position, vertexIndex)
-        .clone();
-      var globalVertex = localVertex.applyMatrix4(mesh.matrix);
-      var directionVector = globalVertex.sub(mesh.position);
+      // Get the local vertex position
+      const localVertex = new THREE.Vector3().fromBufferAttribute(
+        positionAttribute,
+        vertexIndex
+      );
 
-      var ray = new THREE.Raycaster(
-        mesh.position,
+      // Transform the local vertex to world coordinates
+      const globalVertex = localVertex.clone().applyMatrix4(mesh.matrixWorld);
+
+      // Calculate the direction vector from the mesh position to the global vertex
+      const directionVector = globalVertex
+        .clone()
+        .sub(cloneMeshWithNewPosition);
+
+      // Create a raycaster from the mesh position along the direction vector
+      const ray = new THREE.Raycaster(
+        cloneMeshWithNewPosition,
         directionVector.clone().normalize()
       );
-      var collisionResults = ray.intersectObjects(collidableMeshList);
+      const collisionResults = ray.intersectObjects(collidableMeshList);
+
+      // Check if there's a collision
       if (
         collisionResults.length > 0 &&
         collisionResults[0].distance < directionVector.length()
       ) {
-        // a collision occurred... do something...
+        // Collision detected, handle it here
+        return true; // Indicate that a collision occurred
       }
     }
-    return new THREE.Vector3();
+
+    // No collision detected, return false
+    return false;
   };
 
   // pe = mgh
@@ -116,6 +153,9 @@ export const useMesh = () => {
   // v ** 2 - v0 ** 2 = 2gh
   const kinetic = (vel: THREE.Vector3) => {
     const h = Math.pow(vel.y, 2) / (2 * -9.81);
+    const newVy = Math.sqrt(Math.abs(2 * h * 9.81));
+    return new THREE.Vector3(0, newVy, 0);
+    // mgh = mv2
   };
 
   // Drag Coefficient = 0.47, cube = 1.05
@@ -132,5 +172,7 @@ export const useMesh = () => {
     calAcceleration,
     calVelocity,
     calCoordinate,
+    collisionCheck,
+    kinetic,
   };
 };
