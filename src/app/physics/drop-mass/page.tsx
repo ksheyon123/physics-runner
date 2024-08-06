@@ -20,6 +20,7 @@ const Page = () => {
     calCoordinate,
     collisionCheck,
     kinetic,
+    dragForce,
   } = useMesh();
 
   const canvasRef = useRef<HTMLDivElement>();
@@ -61,13 +62,14 @@ const Page = () => {
       const animate = () => {
         id = requestAnimationFrame(animate);
         const prevPosition = mesh.position.clone();
-        const force = calForce(new THREE.Vector3(), prevPosition);
+        const dForce = dragForce(0.47, 1.225, 1, vel.y);
+        const force = calForce(dForce, prevPosition);
         const acc = calAcceleration(force);
         const newVel = calVelocity(vel, acc);
         const newP = calCoordinate(prevPosition, newVel);
         if (collisionCheck(mesh, newP)) {
+          console.log("Collided");
           const { x, y, z } = kinetic(newVel);
-          // newP.set(0, 0, 0);
           newVel.set(x, y, z);
         } else if (newP.y <= 0) {
           const { x, y, z } = kinetic(newVel);

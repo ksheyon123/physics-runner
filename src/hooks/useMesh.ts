@@ -161,7 +161,15 @@ export const useMesh = () => {
   // Drag Coefficient = 0.47, cube = 1.05
   // ρ (Air density) = 1.225 [kg / m3]
   //mg= 1/2 * Cd * ρ * A * v ** 2 > 종단 속도
-  const terminalVelocity = () => {};
+  const dragForce = (
+    Cd: number,
+    density: number,
+    area: number,
+    velocity: number
+  ) => {
+    const dragForce = (1 / 2) * Cd * density * area * Math.pow(velocity, 2);
+    return new THREE.Vector3(0, dragForce, 0);
+  };
 
   // coefficient of restitution (반발계수)
 
@@ -174,5 +182,6 @@ export const useMesh = () => {
     calCoordinate,
     collisionCheck,
     kinetic,
+    dragForce,
   };
 };
