@@ -63,18 +63,20 @@ const Page = () => {
         id = requestAnimationFrame(animate);
         const prevPosition = mesh.position.clone();
         const dForce = dragForce(0.47, 1.225, 1, vel.y);
+        // const dForce = new THREE.Vector3();
         const force = calForce(dForce, prevPosition);
         const acc = calAcceleration(force);
         const newVel = calVelocity(vel, acc);
         const newP = calCoordinate(prevPosition, newVel);
-        if (collisionCheck(mesh, newP)) {
-          console.log("Collided");
-          const { x, y, z } = kinetic(newVel);
-          newVel.set(x, y, z);
-        } else if (newP.y <= 0) {
-          const { x, y, z } = kinetic(newVel);
+        // if (collisionCheck(mesh, newP)) {
+        //   console.log("Collided");
+        //   const { x, y, z } = kinetic(newVel);
+        //   newVel.set(x, y, z);
+        if (newP.y <= 0) {
+          const { x, y, z } = kinetic(vel);
           newVel.set(x, y, z);
         }
+
         mesh.position.set(newP.x, newP.y, newP.z);
         vel.set(newVel.x, newVel.y, newVel.z);
         renderer.render(scene, camera);

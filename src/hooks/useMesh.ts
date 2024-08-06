@@ -3,7 +3,7 @@ import * as THREE from "three";
 
 export const useMesh = () => {
   const dt = 1 / 6; // [s] (10 times faster)
-  const g = -9.81; // [m/s**2]
+  const g = -9.805; // [m/s**2]
   const mass = 1; // [kg]
 
   const meshesRef = useRef<{
@@ -92,6 +92,7 @@ export const useMesh = () => {
     const cVel = vel.clone();
     const cPosition = prevPosition.clone();
     const newPosition = cPosition.add(cVel.multiplyScalar(dt));
+
     return newPosition;
   };
 
@@ -152,8 +153,9 @@ export const useMesh = () => {
 
   // v ** 2 - v0 ** 2 = 2gh
   const kinetic = (vel: THREE.Vector3) => {
-    const h = Math.pow(vel.y, 2) / (2 * -9.81);
-    const newVy = Math.sqrt(Math.abs(2 * h * 9.81));
+    const h = Math.pow(vel.y, 2) / (2 * g);
+    // const newVy = Math.sqrt(Math.abs(2 * h * 9.81));
+    const newVy = Math.sqrt(2 * g * h);
     return new THREE.Vector3(0, newVy, 0);
     // mgh = mv2
   };
