@@ -2,7 +2,7 @@ import { useRef } from "react";
 import * as THREE from "three";
 
 export const useMesh = () => {
-  const dt = 1 / 6; // [s] (10 times faster)
+  const dt = 1 / 60; // [s] (10 times faster)
   const g = -9.805; // [m/s**2]
   const mass = 1; // [kg]
 
@@ -88,10 +88,17 @@ export const useMesh = () => {
    * @param {THREE.Vector3} vel - The velocity vector [m/s].
    * @returns {THREE.Vector3} The new position vector [m].
    */
-  const calCoordinate = (prevPosition: THREE.Vector3, vel: THREE.Vector3) => {
+  const calCoordinate = (
+    prevPosition: THREE.Vector3,
+    prevVel: THREE.Vector3,
+    vel: THREE.Vector3
+  ) => {
     const cVel = vel.clone();
+    const cpVel = prevVel.clone();
     const cPosition = prevPosition.clone();
-    const newPosition = cPosition.add(cVel.multiplyScalar(dt));
+    // const newPosition = cPosition.add(cpVel.add(cVel).multiplyScalar(dt / 2));
+
+    const newPosition = cPosition.add(cpVel.add(cVel).multiplyScalar(dt / 2));
 
     return newPosition;
   };

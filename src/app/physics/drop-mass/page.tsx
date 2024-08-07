@@ -38,15 +38,15 @@ const Page = () => {
       console.log("IS LOADED");
       const scene = createScene();
       const camera = createCamera();
-      camera.position.set(0, 0, 200);
+      camera.position.set(0, 0, 10);
       camera.lookAt(0, 0, 0);
       const renderer = createRenderer(
         window.innerWidth,
         window.innerHeight - 80
       );
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
-      const mesh = createMesh(0, 0, 0, 0xff0000);
-      mesh.position.set(0, 100, 0);
+      const mesh = createMesh(0.5, 0.5, 0.5, 0xff0000);
+      mesh.position.set(0, 5, 0);
       scene.add(mesh);
 
       const plane = createMesh(100, 100, 1);
@@ -57,28 +57,33 @@ const Page = () => {
       plane2.position.set(10, 0, 0);
       scene.add(plane);
 
-      const vel = new THREE.Vector3();
+      const prevVel = new THREE.Vector3();
       let id: any;
       const animate = () => {
         id = requestAnimationFrame(animate);
         const prevPosition = mesh.position.clone();
-        const dForce = dragForce(0.47, 1.225, 1, vel.y);
-        // const dForce = new THREE.Vector3();
+        const dForce = dragForce(0.47, 1.225, 1, prevVel.y);
+
         const force = calForce(dForce, prevPosition);
         const acc = calAcceleration(force);
-        const newVel = calVelocity(vel, acc);
-        const newP = calCoordinate(prevPosition, newVel);
+        const newVel = calVelocity(prevVel, acc);
+
+        // 시간이 길어지면 이동거리가 늘어나는 문제
+        const newP = calCoordinate(prevPosition, prevVel, newVel);
+
         // if (collisionCheck(mesh, newP)) {
         //   console.log("Collided");
         //   const { x, y, z } = kinetic(newVel);
         //   newVel.set(x, y, z);
         if (newP.y <= 0) {
-          const { x, y, z } = kinetic(vel);
+          const { x, y, z } = kinetic(prevVel);
           newVel.set(x, y, z);
+        } else if (newVel.y <= 0 && prevVel.y > 0) {
+          console.log(newP.y);
         }
 
         mesh.position.set(newP.x, newP.y, newP.z);
-        vel.set(newVel.x, newVel.y, newVel.z);
+        prevVel.set(newVel.x, newVel.y, newVel.z);
         renderer.render(scene, camera);
       };
 
