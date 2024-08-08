@@ -75,7 +75,8 @@ const Page = () => {
         //   console.log("Collided");
         //   const { x, y, z } = kinetic(newVel);
         //   newVel.set(x, y, z);
-        if (newP.y <= 0) {
+        if (newP.y <= 0.75) {
+          // Actually, reached point is not the bottom plane
           const { x, y, z } = kinetic(prevVel);
           newVel.set(x, y, z);
         } else if (newVel.y <= 0 && prevVel.y > 0) {

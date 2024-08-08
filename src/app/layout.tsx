@@ -11,6 +11,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <script src="https://kit.fontawesome.com/3062cd7a80.js" />
+        <script
+          type="text/javascript"
+          id="MathJax-script"
+          async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-chtml.js"
+        ></script>
       </head>
       <body>
         <Providers>

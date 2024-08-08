@@ -6,6 +6,8 @@ export const useMesh = () => {
   const g = -9.805; // [m/s**2]
   const mass = 1; // [kg]
 
+  const onClick = () => {};
+
   const meshesRef = useRef<{
     [key: string]: THREE.Mesh<
       any,
@@ -161,6 +163,7 @@ export const useMesh = () => {
   // v ** 2 - v0 ** 2 = 2gh
   const kinetic = (vel: THREE.Vector3) => {
     const h = Math.pow(vel.y, 2) / (2 * g);
+    console.log(h);
     // const newVy = Math.sqrt(Math.abs(2 * h * 9.81));
     const newVy = Math.sqrt(2 * g * h);
     return new THREE.Vector3(0, newVy, 0);
@@ -179,8 +182,6 @@ export const useMesh = () => {
     const dragForce = (1 / 2) * Cd * density * area * Math.pow(velocity, 2);
     return new THREE.Vector3(0, dragForce, 0);
   };
-
-  // coefficient of restitution (반발계수)
 
   return {
     createMesh,

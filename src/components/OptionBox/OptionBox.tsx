@@ -1,11 +1,22 @@
+import { OPTION_BOX_ITEMS } from "@/constants";
 import { useState } from "react";
 
 interface IProps {
-  options: any[];
+  onChangeValue: () => void;
 }
 
-export const OptionBox = ({ options }: IProps) => {
+export const OptionBox = ({ onChangeValue }: IProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  return <div></div>;
+  return (
+    <div>
+      <div onClick={() => setIsOpen(true)}>Menu</div>
+
+      {OPTION_BOX_ITEMS["drop-mass"].map(({ key, label, unit }) => (
+        <div>
+          <input />
+        </div>
+      ))}
+    </div>
+  );
 };
