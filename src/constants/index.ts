@@ -10,6 +10,16 @@ type OptionBoxItem = {
 
 export const NAV_ITEMS = [
   { label: "gravity", key: 1, link: `${SORT_OF_PATH}/drop-mass` },
+  {
+    label: "energy",
+    key: 2,
+    link: `${SORT_OF_PATH}/potential-kinetic`,
+  },
+  {
+    label: "impulse",
+    key: 3,
+    link: `${SORT_OF_PATH}/potential-kinetic`,
+  },
 ];
 
 export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {
