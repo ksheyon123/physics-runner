@@ -49,12 +49,10 @@ export const useMesh = () => {
    * @param {THREE.Vector3} curPosition - The current position vector [m].
    * @returns {THREE.Vector3}
    */
-  const calForce = (force: THREE.Vector3, curPosition: THREE.Vector3) => {
+  const calForce = (force: THREE.Vector3) => {
     const gravity = new THREE.Vector3(0, g, 0);
     const totalForce = force.clone().add(gravity);
-    if (curPosition.y <= 0 && force.y < 0) {
-      totalForce.y = 0;
-    }
+    console.log(totalForce);
     return totalForce;
   };
 
@@ -105,11 +103,17 @@ export const useMesh = () => {
     return newPosition;
   };
 
-  const collisionCheck = (mesh: THREE.Mesh, newPosition: THREE.Vector3) => {
+  const collisionCheck = (
+    mesh: THREE.Mesh,
+    newPosition: THREE.Vector3,
+    collidable: any[] | null = null
+  ) => {
     // Get a list of collidable meshes, excluding the current mesh
-    let collidableMeshList = Object.values(meshesRef.current).filter(
-      (el: any) => mesh.uuid !== el.uuid
-    );
+    let collidableMeshList =
+      collidable ||
+      Object.values(meshesRef.current).filter(
+        (el: any) => mesh.uuid !== el.uuid
+      );
     const cloneMeshWithNewPosition = mesh
       .clone()
       .position.set(newPosition.x, newPosition.y, newPosition.z);

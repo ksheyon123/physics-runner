@@ -13,8 +13,14 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const Page = () => {
   const { createCamera } = useCamera();
   const { createRenderer, createScene } = useRenederer();
-  const { createMesh, calForce, calAcceleration, calVelocity, calCoordinate } =
-    useMesh();
+  const {
+    createMesh,
+    calForce,
+    calAcceleration,
+    calVelocity,
+    calCoordinate,
+    collisionCheck,
+  } = useMesh();
 
   const canvasRef = useRef<HTMLDivElement>();
   const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -95,7 +101,6 @@ const Page = () => {
       });
       const curvedPlane = new THREE.Mesh(curvedPlaneGeometry, material);
 
-      console.log(curvedPlane.position);
       curvedPlane.position.set(0, -0.25, 0);
       scene.add(curvedPlane);
 
@@ -107,7 +112,6 @@ const Page = () => {
         positionAttribute,
         randomIndex
       );
-      console.log(randomVertex);
       const mesh = createMesh(0.5, 0.5, 0.5);
 
       // Step 1: Compute the normal at the vertex
@@ -119,23 +123,36 @@ const Page = () => {
       );
       // mesh.rotateZ(-normal.x / normal.y);
 
-      mesh.position.copy(randomVertex);
-      const prevVel = new THREE.Vector3();
+      mesh.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
+
+      mesh.rotateZ(-normal.x / normal.y);
       scene.add(mesh);
+
+      const prevVel = new THREE.Vector3();
       let theta = Math.acos(normal.x / normal.y);
 
       const animate = (t: number) => {
+        const curPosition = mesh.position.clone();
         const g = 9.805;
-        const uForce = new THREE.Vector3(
-          g * Math.cos(theta),
-          g * Math.sin(theta),
-          0
-        );
-        const force = calForce(uForce, mesh.position.clone());
+
+        let uForce = new THREE.Vector3();
+        const isCollided = collisionCheck(mesh, curPosition, [curvedPlane]);
+
+        if (isCollided) {
+          uForce = new THREE.Vector3(
+            g * Math.cos(theta),
+            g * Math.sin(theta),
+            0
+          );
+          prevVel.set(prevVel.x, 0, prevVel.z);
+        }
+        const force = calForce(uForce);
         const acc = calAcceleration(force);
-        const vel = calVelocity(prevVel, acc);
-        const newP = calCoordinate(mesh.position.clone(), prevVel, vel);
+        const newVel = calVelocity(prevVel, acc);
+        const newP = calCoordinate(curPosition, prevVel, newVel);
+        console.log(newP);
         mesh.position.copy(newP);
+        prevVel.set(newVel.x, newVel.y, newVel.z);
         controls.update();
 
         renderer.render(scene, camera);
