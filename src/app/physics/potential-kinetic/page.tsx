@@ -13,7 +13,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const Page = () => {
   const { createCamera } = useCamera();
   const { createRenderer, createScene } = useRenederer();
-  const { createMesh } = useMesh();
+  const { createMesh, calForce, calAcceleration, calVelocity, calCoordinate } =
+    useMesh();
 
   const canvasRef = useRef<HTMLDivElement>();
   const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -51,19 +52,21 @@ const Page = () => {
       for (let i = 0; i <= widthSegments; i++) {
         for (let j = 0; j <= heightSegments; j++) {
           const u = i / widthSegments;
-          const v = j / heightSegments;
-          const x = u * width - width / 2;
-          const y = v * height - height / 2;
+          const w = j / heightSegments;
+          const x = u * width - width / 2; //
+          const z = w * height - height / 2;
 
           // Modify the z-coordinate to make the plane asymmetric on the ZY plane
           // Introduce an asymmetric term in the z calculation
-          const z = Math.sin(u * Math.PI) * 2; // Asymmetric term
-
+          const y = -Math.sin(u * Math.PI) * 2; // Asymmetric term
           vertices.push(x, y, z);
         }
       }
 
       // Calculate indices
+      // A single segment vertices position
+      // |a, c|
+      // |b, d|
       const indices = [];
       for (let i = 0; i < widthSegments; i++) {
         for (let j = 0; j < heightSegments; j++) {
@@ -92,19 +95,19 @@ const Page = () => {
       });
       const curvedPlane = new THREE.Mesh(curvedPlaneGeometry, material);
 
-      curvedPlane.rotation.x = 90;
-      curvedPlane.position.set(0, -2.5, 0);
+      console.log(curvedPlane.position);
+      curvedPlane.position.set(0, -0.25, 0);
       scene.add(curvedPlane);
 
       // Get the position attribute (which contains the vertices)
       const positionAttribute = curvedPlane.geometry.attributes.position;
-      const normalAttribute = curvedPlane.geometry.attributes.normal;
       // Choose a random vertex index
-      const randomIndex = Math.floor(10);
+      const randomIndex = Math.floor(20);
       const randomVertex = new THREE.Vector3().fromBufferAttribute(
         positionAttribute,
         randomIndex
       );
+      console.log(randomVertex);
       const mesh = createMesh(0.5, 0.5, 0.5);
 
       // Step 1: Compute the normal at the vertex
@@ -114,38 +117,25 @@ const Page = () => {
         curvedPlane.geometry.attributes.normal,
         randomIndex
       );
+      // mesh.rotateZ(-normal.x / normal.y);
 
-      // Step 2: Define the cube's local up vector
-      const cubeUpVector = new THREE.Vector3(0, 1, 0);
-
-      // Step 3: Compute the rotation axis
-      const rotationAxis = new THREE.Vector3();
-      rotationAxis.crossVectors(cubeUpVector, normal).normalize();
-
-      // Step 4: Compute the rotation angle
-      const angle = Math.acos(
-        cubeUpVector.dot(normal) / (cubeUpVector.length() * normal.length())
-      );
-
-      // Step 5: Create the quaternion
-      const quaternion = new THREE.Quaternion();
-      quaternion.setFromAxisAngle(rotationAxis, angle);
-
-      // Step 6: Apply the quaternion to the cube
-      mesh.setRotationFromQuaternion(quaternion);
-
-      // Optionally, you can move the cube to the vertex position
-      // const vertexPosition = new THREE.Vector3();
-      // vertexPosition.fromBufferAttribute(
-      //   curvedPlane.geometry.attributes.position,
-      //   randomIndex
-      // );
-      const a = new THREE.Vector3(0, 0, 0);
       mesh.position.copy(randomVertex);
-
+      const prevVel = new THREE.Vector3();
       scene.add(mesh);
+      let theta = Math.acos(normal.x / normal.y);
+
       const animate = (t: number) => {
-        // requestAnimationFrame(animate);
+        const g = 9.805;
+        const uForce = new THREE.Vector3(
+          g * Math.cos(theta),
+          g * Math.sin(theta),
+          0
+        );
+        const force = calForce(uForce, mesh.position.clone());
+        const acc = calAcceleration(force);
+        const vel = calVelocity(prevVel, acc);
+        const newP = calCoordinate(mesh.position.clone(), prevVel, vel);
+        mesh.position.copy(newP);
         controls.update();
 
         renderer.render(scene, camera);
@@ -154,6 +144,29 @@ const Page = () => {
       renderer.setAnimationLoop(animate);
     }
   }, [isMounted]);
+
+  const getNormalAtPoint = (
+    mesh: THREE.Mesh,
+    point: THREE.Vector3,
+    direction: THREE.Vector3
+  ) => {
+    const raycaster = new THREE.Raycaster();
+    raycaster.ray.origin.copy(point);
+    raycaster.ray.direction.set(direction.x, direction.y, direction.z); // Direction of ray (assuming downward in the Z-axis)
+
+    const intersects = raycaster.intersectObject(mesh); // mesh is the object containing the geometry
+    if (intersects.length > 0) {
+      const intersect = intersects[0];
+
+      // Get the face normal
+      const normal = intersect.face!.normal.clone();
+      console.log(normal);
+      // normal.applyQuaternion(mesh.quaternion); // Apply the mesh's rotation to get the world normal
+
+      return normal;
+    }
+    return null; // No intersection found, return null
+  };
 
   return (
     <StyledDrawer
