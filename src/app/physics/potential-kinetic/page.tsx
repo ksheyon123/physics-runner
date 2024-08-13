@@ -123,34 +123,41 @@ const Page = () => {
       );
       // mesh.rotateZ(-normal.x / normal.y);
 
-      mesh.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
+      mesh.position.set(randomVertex.x, randomVertex.y + 0.01, randomVertex.z);
 
       mesh.rotateZ(-normal.x / normal.y);
       scene.add(mesh);
 
       const prevVel = new THREE.Vector3();
-      let theta = Math.acos(normal.x / normal.y);
+      let uForce = new THREE.Vector3();
 
       const animate = (t: number) => {
         const curPosition = mesh.position.clone();
         const g = 9.805;
 
-        let uForce = new THREE.Vector3();
-        const isCollided = collisionCheck(mesh, curPosition, [curvedPlane]);
+        const force = calForce(uForce);
+        console.log(force);
+        const acc = calAcceleration(force);
+        const newVel = calVelocity(prevVel, acc);
+        const newP = calCoordinate(curPosition, prevVel, newVel);
 
+        const { isCollided } = collisionCheck(
+          mesh,
+          new THREE.Vector3(curPosition.x, curPosition.y - 0.02, curPosition.z),
+          [curvedPlane]
+        );
+        const { normal } = collisionCheck(mesh, newP, [curvedPlane]);
         if (isCollided) {
+          const theta = Math.acos(normal?.x || 0 / normal?.y || 0);
           uForce = new THREE.Vector3(
             g * Math.cos(theta),
             g * Math.sin(theta),
             0
           );
-          prevVel.set(prevVel.x, 0, prevVel.z);
+        } else {
+          uForce = new THREE.Vector3();
         }
-        const force = calForce(uForce);
-        const acc = calAcceleration(force);
-        const newVel = calVelocity(prevVel, acc);
-        const newP = calCoordinate(curPosition, prevVel, newVel);
-        console.log(newP);
+
         mesh.position.copy(newP);
         prevVel.set(newVel.x, newVel.y, newVel.z);
         controls.update();

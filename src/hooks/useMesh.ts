@@ -51,8 +51,7 @@ export const useMesh = () => {
    */
   const calForce = (force: THREE.Vector3) => {
     const gravity = new THREE.Vector3(0, g, 0);
-    const totalForce = force.clone().add(gravity);
-    console.log(totalForce);
+    const totalForce = gravity.add(force.clone());
     return totalForce;
   };
 
@@ -119,7 +118,6 @@ export const useMesh = () => {
       .position.set(newPosition.x, newPosition.y, newPosition.z);
     // Get the positions attribute from the geometry
     const positionAttribute = mesh.geometry.attributes.position;
-
     // Iterate through each vertex of the mesh
     for (
       let vertexIndex = 0;
@@ -146,19 +144,24 @@ export const useMesh = () => {
         directionVector.clone().normalize()
       );
       const collisionResults = ray.intersectObjects(collidableMeshList);
-
       // Check if there's a collision
       if (
         collisionResults.length > 0 &&
         collisionResults[0].distance < directionVector.length()
       ) {
         // Collision detected, handle it here
-        return true; // Indicate that a collision occurred
+        return {
+          normal: collisionResults[0].normal,
+          isCollided: true,
+        }; // Indicate that a collision occurred
       }
     }
 
     // No collision detected, return false
-    return false;
+    return {
+      normal: undefined,
+      isCollided: false,
+    };
   };
 
   // pe = mgh
