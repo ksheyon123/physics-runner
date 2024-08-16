@@ -148,7 +148,7 @@ const Page = () => {
         );
         const { normal } = collisionCheck(mesh, newP, [curvedPlane]);
         if (isCollided) {
-          const theta = Math.acos(normal?.x || 0 / normal?.y || 0);
+          const theta = Math.acos((normal?.x || 0) / (normal?.y || 0));
           uForce = new THREE.Vector3(
             g * Math.cos(theta),
             g * Math.sin(theta),
