@@ -1,8 +1,13 @@
 import styles from "./Controller.module.css";
 import * as THREE from "three";
-import {} from "@fortawesome/react-fontawesome";
-import {} from "@fortawesome/free-solid-svg-icons";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRight,
+  faArrowLeft,
+  faArrowDown,
+  faArrowUp,
+} from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
 interface IProps {
   scene: THREE.Scene | undefined;
 }
@@ -24,7 +29,6 @@ export const Controller = ({ scene }: IProps) => {
 type SortOfKey = "ArrowUp" | "ArrowDown" | "ArrowRight" | "ArrowLeft";
 
 const DirectionPanel = ({ scene }: IProps) => {
-  const ref = useRef<HTMLDivElement>();
   const [key, setKey] = useState<{ [key in SortOfKey]: boolean }>({
     ArrowDown: false,
     ArrowUp: false,
@@ -43,15 +47,34 @@ const DirectionPanel = ({ scene }: IProps) => {
       setKey((prev) => ({ ...prev, [code]: false }));
     };
 
-    if (ref.current) {
-      ref.current?.addEventListener("keydown", keydownHandler);
-      ref.current?.addEventListener("keyup", keyupHandler);
-      return () => {
-        ref.current?.removeEventListener("keydown", keydownHandler);
-        ref.current?.removeEventListener("keyup", keyupHandler);
-      };
-    }
-  }, [ref, scene]);
+    window.addEventListener("keydown", keydownHandler);
+    window.addEventListener("keyup", keyupHandler);
+    return () => {
+      window.removeEventListener("keydown", keydownHandler);
+      window.removeEventListener("keyup", keyupHandler);
+    };
+  }, [scene]);
 
-  return <div ref={ref as RefObject<HTMLDivElement>}></div>;
+  return (
+    // <div className={styles["direction-panel"]}>
+    //   <FontAwesomeIcon size="2xl" icon={faArrowRight} />
+    //   <FontAwesomeIcon size="2xl" icon={faArrowLeft} />
+    //   <FontAwesomeIcon size="2xl" icon={faArrowUp} />
+    //   <FontAwesomeIcon size="2xl" icon={faArrowDown} />
+    // </div>
+    <div className={styles["arrow-keys"]}>
+      <div className={styles["key"] + " " + styles["up"]}>
+        <FontAwesomeIcon size="2xl" icon={faArrowUp} />
+      </div>
+      <div className={styles["key"] + " " + styles["left"]}>
+        <FontAwesomeIcon size="2xl" icon={faArrowLeft} />
+      </div>
+      <div className={styles["key"] + " " + styles["down"]}>
+        <FontAwesomeIcon size="2xl" icon={faArrowDown} />
+      </div>
+      <div className={styles["key"] + " " + styles["right"]}>
+        <FontAwesomeIcon size="2xl" icon={faArrowRight} />
+      </div>
+    </div>
+  );
 };
