@@ -1,4 +1,5 @@
-const SORT_OF_PATH = "physics";
+const PHYSICS = "physics";
+const TUTORIAL = "tutorial";
 
 type SortOfPath = "drop-mass";
 
@@ -8,18 +9,22 @@ type OptionBoxItem = {
   unit: string;
 };
 
-export const NAV_ITEMS = [
-  { label: "gravity", key: 1, link: `${SORT_OF_PATH}/drop-mass` },
+export const NAV_PHYSICS_ITEMS = [
+  { label: "gravity", key: 1, link: `${PHYSICS}/drop-mass` },
   {
     label: "energy",
     key: 2,
-    link: `${SORT_OF_PATH}/potential-kinetic`,
+    link: `${PHYSICS}/potential-kinetic`,
   },
   {
     label: "impulse",
     key: 3,
-    link: `${SORT_OF_PATH}/potential-kinetic`,
+    link: `${PHYSICS}/potential-kinetic`,
   },
+];
+
+export const NAV_TEST_ITEMS = [
+  { label: "Collision", key: 1, link: `${TUTORIAL}/collision-check` },
 ];
 
 export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {

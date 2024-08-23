@@ -64,7 +64,7 @@ const Page = () => {
         const prevPosition = mesh.position.clone();
         const dForce = dragForce(0.47, 1.225, 1, prevVel.y);
 
-        const force = calForce(dForce, prevPosition);
+        const force = calForce(dForce);
         const acc = calAcceleration(force);
         const newVel = calVelocity(prevVel, acc);
 
