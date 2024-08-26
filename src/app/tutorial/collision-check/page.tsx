@@ -25,9 +25,7 @@ const Page = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(sceneRef);
-    if (sceneRef.current) {
-      console.log("Animation");
+    if (isMounted) {
       const camera = createCamera();
       const renderer = createRenderer(
         window.innerWidth,
@@ -45,13 +43,12 @@ const Page = () => {
       const handleId = requestAnimationFrame(animate);
       return () => cancelAnimationFrame(handleId);
     }
-  }, [sceneRef]);
+  }, [isMounted]);
 
   useEffect(() => {
     const scene = createScene();
     sceneRef.current = scene;
-    // setIsMounted(true);
-    console.log("Run is Mounted");
+    setIsMounted(true);
   }, []);
 
   return (
