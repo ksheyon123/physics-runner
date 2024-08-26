@@ -194,8 +194,8 @@ const Page = () => {
 
   return (
     <StyledDrawer
-      $width={window.innerWidth}
-      $height={window.innerHeight - 80}
+      $width={window.innerWidth || 0}
+      $height={window.innerHeight - 80 || 0}
       ref={canvasRef as RefObject<HTMLDivElement>}
     />
   );

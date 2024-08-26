@@ -56,23 +56,33 @@ const DirectionPanel = ({ scene }: IProps) => {
   }, [scene]);
 
   return (
-    // <div className={styles["direction-panel"]}>
-    //   <FontAwesomeIcon size="2xl" icon={faArrowRight} />
-    //   <FontAwesomeIcon size="2xl" icon={faArrowLeft} />
-    //   <FontAwesomeIcon size="2xl" icon={faArrowUp} />
-    //   <FontAwesomeIcon size="2xl" icon={faArrowDown} />
-    // </div>
     <div className={styles["arrow-keys"]}>
-      <div className={styles["key"] + " " + styles["up"]}>
+      <div
+        className={`${styles["key"]} ${styles["up"]} ${
+          key.ArrowUp ? styles["active"] : ""
+        }`}
+      >
         <FontAwesomeIcon size="2xl" icon={faArrowUp} />
       </div>
-      <div className={styles["key"] + " " + styles["left"]}>
+      <div
+        className={`${styles["key"]} ${styles["left"]} ${
+          key.ArrowLeft ? styles["active"] : ""
+        }`}
+      >
         <FontAwesomeIcon size="2xl" icon={faArrowLeft} />
       </div>
-      <div className={styles["key"] + " " + styles["down"]}>
+      <div
+        className={`${styles["key"]} ${styles["down"]} ${
+          key.ArrowDown ? styles["active"] : ""
+        }`}
+      >
         <FontAwesomeIcon size="2xl" icon={faArrowDown} />
       </div>
-      <div className={styles["key"] + " " + styles["right"]}>
+      <div
+        className={`${styles["key"]} ${styles["right"]} ${
+          key.ArrowRight ? styles["active"] : ""
+        }`}
+      >
         <FontAwesomeIcon size="2xl" icon={faArrowRight} />
       </div>
     </div>

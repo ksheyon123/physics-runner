@@ -1,4 +1,7 @@
 .controller-container {
+  position: fixed;
+  bottom: 0;
+  display: flex;
   width: 100vw;
   height: 120px;
   border-top: 1px solid #aaa;
@@ -26,10 +29,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ccc;
+  background-color: #fff;
   border: 1px solid #999;
   font-size: 24px;
   font-weight: bold;
+}
+
+.active {
+  background-color: #aaa;
 }
 
 .up {
