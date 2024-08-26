@@ -7,9 +7,10 @@ import { useRenederer } from "@/hooks/useRenderer";
 import { RefObject, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import styled from "styled-components";
+import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 
 const Page = () => {
-  const canvasRef = useRef<HTMLDivElement>();
+  const canvasRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene>();
   const { createCamera } = useCamera();
   const { createRenderer, createScene } = useRenederer();
@@ -53,20 +54,14 @@ const Page = () => {
 
   return (
     <>
-      <StyledDrawer
-        $width={window.innerWidth || 0}
-        $height={window.innerHeight - 200 || 0}
-        ref={canvasRef as RefObject<HTMLDivElement>}
+      <ForwardedCanvas
+        ref={canvasRef}
+        width={window.innerWidth}
+        height={window.innerHeight - 200}
       />
       <Controller scene={sceneRef.current} />
     </>
   );
 };
-
-const StyledDrawer = styled.div<{ $width?: number; $height?: number }>`
-  position: relative;
-  width: ${(props) => `${props.$width}px` || "100%"};
-  height: ${(props) => `${props.$height}px` || "100%"};
-`;
 
 export default Page;

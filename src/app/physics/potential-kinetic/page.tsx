@@ -1,5 +1,6 @@
 "use client";
 
+import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 import { useCamera } from "@/hooks/useCamera";
 import { useMesh } from "@/hooks/useMesh";
 import { useRenederer } from "@/hooks/useRenderer";
@@ -22,7 +23,7 @@ const Page = () => {
     collisionCheck,
   } = useMesh();
 
-  const canvasRef = useRef<HTMLDivElement>();
+  const canvasRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
@@ -193,18 +194,12 @@ const Page = () => {
   };
 
   return (
-    <StyledDrawer
-      $width={window.innerWidth || 0}
-      $height={window.innerHeight - 80 || 0}
-      ref={canvasRef as RefObject<HTMLDivElement>}
+    <ForwardedCanvas
+      ref={canvasRef}
+      width={window.innerWidth}
+      height={window.innerHeight - 80}
     />
   );
 };
-
-const StyledDrawer = styled.div<{ $width?: number; $height?: number }>`
-  position: relative;
-  width: ${(props) => `${props.$width}px` || "100%"};
-  height: ${(props) => `${props.$height}px` || "100%"};
-`;
 
 export default Page;
