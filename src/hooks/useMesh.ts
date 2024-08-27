@@ -1,3 +1,4 @@
+import { makeMesh } from "@/utils/threejs.utils";
 import { useRef } from "react";
 import * as THREE from "three";
 
@@ -32,9 +33,7 @@ export const useMesh = () => {
     depth?: number,
     color?: number
   ) => {
-    const geometry = new THREE.BoxGeometry(width || 5, height || 5, depth || 5);
-    const material = new THREE.MeshBasicMaterial({ color: color || 0x000000 });
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = makeMesh(width, height, depth, color);
     meshesRef.current = {
       ...meshesRef.current,
       [cube.uuid]: cube,
@@ -101,6 +100,8 @@ export const useMesh = () => {
 
     return newPosition;
   };
+
+  const collisionCheck2 = (mesh: THREE.Mesh, direction: THREE.Vector3) => {};
 
   const collisionCheck = (
     mesh: THREE.Mesh,

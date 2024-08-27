@@ -28,19 +28,20 @@ const Page = () => {
 
   useEffect(() => {
     if (isMounted) {
+      const scene = createScene();
       const camera = createCamera();
+      camera.position.set(0, 0, 10);
+      camera.lookAt(0, 0, 0);
       const renderer = createRenderer(
         window.innerWidth,
-        window.innerHeight - 200
+        window.innerHeight - 80
       );
-
-      const scene = sceneRef.current!;
 
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
 
-      const cubeInstance = new Cube({});
-      const cube = cubeInstance.getMesh();
-      scene.add(cube);
+      const mesh = createMesh(0.5, 0.5, 0.5, 0xff0000);
+      mesh.position.set(0, 5, 0);
+      scene.add(mesh);
 
       const animate = () => {
         renderer.render(scene, camera);
@@ -62,9 +63,8 @@ const Page = () => {
       <ForwardedCanvas
         ref={canvasRef}
         width={window.innerWidth}
-        height={window.innerHeight - 200}
+        height={window.innerHeight - 80}
       />
-      <Controller scene={sceneRef.current} />
     </>
   );
 };
