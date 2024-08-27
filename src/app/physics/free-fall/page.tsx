@@ -4,11 +4,12 @@ import { Controller } from "@/components/Controller/Controller";
 import { useCamera } from "@/hooks/useCamera";
 import { useMesh } from "@/hooks/useMesh";
 import { useRenederer } from "@/hooks/useRenderer";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { createElement, RefObject, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import styled from "styled-components";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 import Cube from "@/types/Model";
+import { div } from "three/webgpu";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -43,11 +44,31 @@ const Page = () => {
       mesh.position.set(0, 5, 0);
       scene.add(mesh);
 
+      const prevVel = new THREE.Vector3();
+      let handleId: any;
+      const divEl = document.createElement("div");
+      divEl.setAttribute(
+        "style",
+        "position : absolute; top : 0; right : 0; width : 100px; height : 50px"
+      );
+      canvasRef.current!.appendChild(divEl);
       const animate = () => {
+        const prevPosition = mesh.position.clone();
+        const force = calForce(new THREE.Vector3());
+        const acc = calAcceleration(force);
+        const newVel = calVelocity(prevVel, acc);
+
+        const newP = calCoordinate(prevPosition, prevVel, newVel);
+
+        mesh.position.set(newP.x, newP.y, newP.z);
+        prevVel.set(newVel.x, newVel.y, newVel.z);
+
+        divEl.innerHTML = "Vel y : " + newVel.y;
+        handleId = requestAnimationFrame(animate);
         renderer.render(scene, camera);
       };
 
-      const handleId = requestAnimationFrame(animate);
+      animate();
       return () => cancelAnimationFrame(handleId);
     }
   }, [isMounted]);

@@ -10,15 +10,10 @@ type OptionBoxItem = {
 };
 
 export const NAV_PHYSICS_ITEMS = [
-  { label: "gravity", key: 1, link: `${PHYSICS}/drop-mass` },
+  { label: "Free Fall", key: 1, link: `${PHYSICS}/free-fall` },
   {
     label: "energy",
     key: 2,
-    link: `${PHYSICS}/potential-kinetic`,
-  },
-  {
-    label: "impulse",
-    key: 3,
     link: `${PHYSICS}/potential-kinetic`,
   },
 ];
