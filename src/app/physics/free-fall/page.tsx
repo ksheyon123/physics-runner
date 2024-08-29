@@ -10,6 +10,7 @@ import styled from "styled-components";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 import Cube from "@/types/Model";
 import { div } from "three/webgpu";
+import { Gauge } from "@/components/Gauge/Gauge";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -86,6 +87,9 @@ const Page = () => {
         width={window.innerWidth}
         height={window.innerHeight - 80}
       />
+      <div>
+        <Gauge value={0} onChangeValue={() => {}} />
+      </div>
     </>
   );
 };

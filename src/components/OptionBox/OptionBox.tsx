@@ -11,8 +11,7 @@ export const OptionBox = ({ onChangeValue }: IProps) => {
   return (
     <div>
       <div onClick={() => setIsOpen(true)}>Menu</div>
-
-      {OPTION_BOX_ITEMS["drop-mass"].map(({ key, label, unit }) => (
+      {OPTION_BOX_ITEMS["free-fall"].map(({ key, label, unit }) => (
         <div>
           <input />
         </div>

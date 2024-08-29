@@ -1,12 +1,15 @@
+import { Gauge } from "@/components/Gauge/Gauge";
+
 const PHYSICS = "physics";
 const TUTORIAL = "tutorial";
 
-type SortOfPath = "drop-mass";
+type SortOfPath = "free-fall";
 
 type OptionBoxItem = {
   key: string;
   label: string;
   unit: string;
+  renderer?: (props: any) => JSX.Element;
 };
 
 export const NAV_PHYSICS_ITEMS = [
@@ -23,11 +26,12 @@ export const NAV_TEST_ITEMS = [
 ];
 
 export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {
-  "drop-mass": [
+  "free-fall": [
     {
       label: "Drag Coefficient",
       key: "cd",
       unit: "",
+      renderer: (props: any) => <></>,
     },
     {
       label: "Gravity",
