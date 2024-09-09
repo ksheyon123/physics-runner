@@ -9,6 +9,8 @@ type OptionBoxItem = {
   key: string;
   label: string;
   unit: string;
+  min?: number;
+  max?: number;
   renderer?: (props: any) => JSX.Element;
 };
 
@@ -31,17 +33,23 @@ export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {
       label: "Drag Coefficient",
       key: "cd",
       unit: "",
+      min: 0,
+      max: 0,
       renderer: (props: any) => <></>,
     },
     {
       label: "Gravity",
       key: "g",
       unit: "m / s**2",
+      min: 0,
+      max: 0,
     },
     {
       label: "Mass",
       key: "mass",
       unit: "kg",
+      min: 0,
+      max: 0,
     },
   ],
 };

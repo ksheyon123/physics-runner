@@ -4,11 +4,12 @@ import styled from "styled-components";
 import styles from "./Gauge.module.css";
 
 interface IProps {
+  key: string;
   value: number;
-  onChangeValue: (event: ChangeEvent) => void;
+  onChangeValue: (key: string, event: ChangeEvent) => void;
 }
 
-export const Gauge = ({ value, onChangeValue }: IProps) => {
+export const Gauge = ({ key, value, onChangeValue }: IProps) => {
   const barRef = useRef<HTMLDivElement>(null);
 
   const [range, changeRange] = useState<[number, number]>([0, 0]);
@@ -25,36 +26,49 @@ export const Gauge = ({ value, onChangeValue }: IProps) => {
     });
   };
 
+  // cal 0 ~ 100 to range value
+  const calRange = () => {};
+
+  // validate input value
+  const validate = () => {};
+
+  // Directly change input range value
+  const onChangeInput = (e: ChangeEvent) => {};
+
   useEffect(() => {
-    let isMouseDown: boolean = false;
-    const mousedown = (e: MouseEvent) => {
-      setBarPosition(e.offsetX);
-      isMouseDown = true;
-    };
-    const mousemove = () => {
-      if (!isMouseDown) return;
-    };
-
-    const mouseup = () => {
-      isMouseDown = false;
-    };
-
     if (barRef) {
+      let isMoueseDown: boolean = false;
+      const mousedown = (e: MouseEvent) => {
+        isMoueseDown = true;
+        setBarPosition(e.offsetX);
+      };
+
+      const mousemove = (e: MouseEvent) => {
+        if (!isMoueseDown) return;
+        setBarPosition(e.offsetX);
+      };
+
+      const mouseup = () => {
+        isMoueseDown = false;
+      };
       barRef.current?.addEventListener("mousedown", mousedown);
       barRef.current?.addEventListener("mousemove", mousemove);
       barRef.current?.addEventListener("mouseup", mouseup);
+      barRef.current?.addEventListener("mouseout", mouseup);
+
       return () => {
         barRef.current?.removeEventListener("mousedown", mousedown);
         barRef.current?.removeEventListener("mousemove", mousedown);
         barRef.current?.removeEventListener("mouseup", mouseup);
+        barRef.current?.removeEventListener("mouseout", mouseup);
       };
     }
-  }, [barRef]);
+  }, [barRef, setBarPosition]);
 
   return (
-    <div>
+    <div key={key} className={styles["gauge-container"]}>
       <div className={styles["gauge-wrapper"]}>
-        <div className={styles["gauge-input"]}>
+        <div className={styles["gauge-range"]}>
           <input
             value={range[0]}
             onChange={(e) =>
@@ -63,18 +77,17 @@ export const Gauge = ({ value, onChangeValue }: IProps) => {
           />
         </div>
         <div className={styles["gauge-controller"]}>
-          <StyledGauge
+          <div
             ref={barRef as RefObject<HTMLDivElement>}
-            barP={barPosition || 0}
+            className={styles["gauge-background"]}
           >
-            <div className="background"></div>
-            <div className="bar"></div>
-          </StyledGauge>
+            <StyledBar barP={barPosition || 0} />
+          </div>
           <div className={styles["gauge-input"]}>
-            <input value={value} onChange={onChangeValue} />
+            <input value={value} onChange={(e) => onChangeValue(key, e)} />
           </div>
         </div>
-        <div className={styles["gauge-input"]}>
+        <div className={styles["gauge-range"]}>
           <input
             value={range[1]}
             onChange={(e) => onChangeRange("end", Number(e.target.value || 0))}
@@ -85,27 +98,11 @@ export const Gauge = ({ value, onChangeValue }: IProps) => {
   );
 };
 
-const StyledGauge = styled.div<{ barP: number }>`
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  width: 100px;
-  height: 30px;
-  justify-contents: center;
-  align-items: center;
-  margin: 0px 5px;
-
-  div.background {
-    width: 100%;
-    height: 8px;
-    background-color: #ccc;
-  }
-
-  div.bar {
-    position: absolute;
-    left: ${(props) => props.barP}px;
-    width: 10px;
-    height: 30px;
-    background-color: #ddd;
-  }
+const StyledBar = styled.div<{ barP: number }>`
+  position: absolute;
+  left: ${(props) => props.barP}px;
+  width: 10px;
+  height: 20px;
+  background-color: #ddd;
+  pointer-events: none;
 `;

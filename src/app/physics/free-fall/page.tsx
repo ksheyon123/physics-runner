@@ -82,14 +82,14 @@ const Page = () => {
 
   return (
     <>
+      <div>
+        <Gauge key={""} value={0} onChangeValue={() => {}} />
+      </div>
       <ForwardedCanvas
         ref={canvasRef}
         width={window.innerWidth}
         height={window.innerHeight - 80}
       />
-      <div>
-        <Gauge value={0} onChangeValue={() => {}} />
-      </div>
     </>
   );
 };
