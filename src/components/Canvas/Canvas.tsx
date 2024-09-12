@@ -4,12 +4,17 @@ import styled from "styled-components";
 interface CanvasProps {
   width: number;
   height: number;
+  children?: React.ReactNode;
 }
 
 export const ForwardedCanvas = forwardRef<HTMLDivElement, CanvasProps>(
   (props, ref) => {
-    const { width, height } = props;
-    return <StyledDrawer ref={ref} width={width} height={height} />;
+    const { width, height, children } = props;
+    return (
+      <StyledDrawer ref={ref} width={width} height={height}>
+        {children}
+      </StyledDrawer>
+    );
   }
 );
 

@@ -5,12 +5,13 @@ const TUTORIAL = "tutorial";
 
 type SortOfPath = "free-fall";
 
-type OptionBoxItem = {
+export type OptionBoxItem = {
   key: string;
   label: string;
   unit: string;
   min?: number;
   max?: number;
+  initValue?: number;
   renderer?: (props: any) => JSX.Element;
 };
 
@@ -34,8 +35,9 @@ export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {
       key: "cd",
       unit: "",
       min: 0,
-      max: 0,
-      renderer: (props: any) => <></>,
+      max: 1.25,
+      initValue: 0,
+      renderer: (props: any) => <Gauge {...props} />,
     },
     {
       label: "Gravity",

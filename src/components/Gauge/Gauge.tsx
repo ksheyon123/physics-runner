@@ -2,17 +2,17 @@ import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 import styles from "./Gauge.module.css";
+import { OptionBoxItem } from "@/constants";
 
-interface IProps {
-  key: string;
-  value: number;
+interface IProps extends OptionBoxItem {
   onChangeValue: (key: string, event: ChangeEvent) => void;
 }
 
-export const Gauge = ({ key, value, onChangeValue }: IProps) => {
+export const Gauge = ({ key, min, max, initValue, onChangeValue }: IProps) => {
   const barRef = useRef<HTMLDivElement>(null);
 
-  const [range, changeRange] = useState<[number, number]>([0, 0]);
+  const [range, changeRange] = useState<[number, number]>([min || 0, max || 0]);
+  const [value, setValue] = useState<number>();
 
   const [barPosition, setBarPosition] = useState<number>();
 
@@ -27,25 +27,44 @@ export const Gauge = ({ key, value, onChangeValue }: IProps) => {
   };
 
   // cal 0 ~ 100 to range value
-  const calRange = () => {};
+  const calRange = (p: number) => {
+    // Get total range size
+    const t = range[1] - range[0];
+    // get real v
+    const c = t * p + range[0];
+    return c;
+  };
 
   // validate input value
   const validate = () => {};
 
   // Directly change input range value
-  const onChangeInput = (e: ChangeEvent) => {};
+  const onChangeInput = (key: string, e: any) => {
+    const v = e.target.value;
+    onChangeValue(key, e);
+    setValue(v);
+  };
+
+  useEffect(() => {
+    if (barPosition) {
+      const p = barPosition / 100;
+      const t = calRange(p);
+      setValue(t);
+    }
+  }, [barPosition, range[0], range[1]]);
 
   useEffect(() => {
     if (barRef) {
       let isMoueseDown: boolean = false;
       const mousedown = (e: MouseEvent) => {
         isMoueseDown = true;
-        setBarPosition(e.offsetX);
+
+        setBarPosition(e.offsetX < 0 ? 0 : e.offsetX);
       };
 
       const mousemove = (e: MouseEvent) => {
         if (!isMoueseDown) return;
-        setBarPosition(e.offsetX);
+        setBarPosition(e.offsetX < 0 ? 0 : e.offsetX);
       };
 
       const mouseup = () => {
@@ -84,7 +103,10 @@ export const Gauge = ({ key, value, onChangeValue }: IProps) => {
             <StyledBar barP={barPosition || 0} />
           </div>
           <div className={styles["gauge-input"]}>
-            <input value={value} onChange={(e) => onChangeValue(key, e)} />
+            <input
+              value={value || initValue || 0}
+              onChange={(e) => onChangeInput(key, e)}
+            />
           </div>
         </div>
         <div className={styles["gauge-range"]}>

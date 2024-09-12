@@ -1,21 +1,25 @@
 import { OPTION_BOX_ITEMS } from "@/constants";
+import styles from "./OptionBox.module.css";
 import { useState } from "react";
 
 interface IProps {
-  onChangeValue: () => void;
+  onChangeValue?: () => void;
 }
 
 export const OptionBox = ({ onChangeValue }: IProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <div>
-      <div onClick={() => setIsOpen(true)}>Menu</div>
-      {OPTION_BOX_ITEMS["free-fall"].map(({ key, label, unit }) => (
+    <div className={styles["option-box-container"]}>
+      {!isOpen && <div onClick={() => setIsOpen(true)}>Menu</div>}
+      {isOpen && (
         <div>
-          <input />
+          {OPTION_BOX_ITEMS["free-fall"].map((props) => {
+            const { key, label, unit, renderer } = props;
+            return <>{!!renderer && renderer(props)}</>;
+          })}
         </div>
-      ))}
+      )}
     </div>
   );
 };

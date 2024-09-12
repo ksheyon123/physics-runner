@@ -11,6 +11,7 @@ import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 import Cube from "@/types/Model";
 import { div } from "three/webgpu";
 import { Gauge } from "@/components/Gauge/Gauge";
+import { OptionBox } from "@/components/OptionBox/OptionBox";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -47,12 +48,12 @@ const Page = () => {
 
       const prevVel = new THREE.Vector3();
       let handleId: any;
-      const divEl = document.createElement("div");
-      divEl.setAttribute(
-        "style",
-        "position : absolute; top : 0; right : 0; width : 100px; height : 50px"
-      );
-      canvasRef.current!.appendChild(divEl);
+      // const divEl = document.createElement("div");
+      // divEl.setAttribute(
+      //   "style",
+      //   "position : absolute; top : 0; right : 0; width : 100px; height : 50px"
+      // );
+      // canvasRef.current!.appendChild(divEl);
       const animate = () => {
         const prevPosition = mesh.position.clone();
         const force = calForce(new THREE.Vector3());
@@ -64,7 +65,7 @@ const Page = () => {
         mesh.position.set(newP.x, newP.y, newP.z);
         prevVel.set(newVel.x, newVel.y, newVel.z);
 
-        divEl.innerHTML = "Vel y : " + newVel.y;
+        // divEl.innerHTML = "Vel y : " + newVel.y;
         handleId = requestAnimationFrame(animate);
         renderer.render(scene, camera);
       };
@@ -82,14 +83,13 @@ const Page = () => {
 
   return (
     <>
-      <div>
-        <Gauge key={""} value={0} onChangeValue={() => {}} />
-      </div>
       <ForwardedCanvas
         ref={canvasRef}
         width={window.innerWidth}
         height={window.innerHeight - 80}
-      />
+      >
+        <OptionBox />
+      </ForwardedCanvas>
     </>
   );
 };
