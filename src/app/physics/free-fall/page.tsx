@@ -12,10 +12,12 @@ import Cube from "@/types/Model";
 import { div } from "three/webgpu";
 import { Gauge } from "@/components/Gauge/Gauge";
 import { OptionBox } from "@/components/OptionBox/OptionBox";
+import { useText } from "@/hooks/useText";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene>();
+  const { isLoaded, createText, updateText } = useText();
   const { createCamera } = useCamera();
   const { createRenderer, createScene } = useRenederer();
   const {
@@ -30,7 +32,7 @@ const Page = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isMounted) {
+    if (isMounted && isLoaded) {
       const scene = createScene();
       const camera = createCamera();
       camera.position.set(0, 0, 10);
@@ -47,24 +49,26 @@ const Page = () => {
       scene.add(mesh);
 
       const prevVel = new THREE.Vector3();
+
+      const textMesh = createText(prevVel.y.toString());
+      console.log(textMesh);
+      textMesh.position.set(2, 5, 0);
+
+      scene.add(textMesh);
+
       let handleId: any;
-      // const divEl = document.createElement("div");
-      // divEl.setAttribute(
-      //   "style",
-      //   "position : absolute; top : 0; right : 0; width : 100px; height : 50px"
-      // );
-      // canvasRef.current!.appendChild(divEl);
+
       const animate = () => {
         const prevPosition = mesh.position.clone();
         const force = calForce(new THREE.Vector3());
         const acc = calAcceleration(force);
         const newVel = calVelocity(prevVel, acc);
-
         const newP = calCoordinate(prevPosition, prevVel, newVel);
 
         mesh.position.set(newP.x, newP.y, newP.z);
         prevVel.set(newVel.x, newVel.y, newVel.z);
-
+        updateText(textMesh, newVel.y.toString());
+        textMesh.position.set(2, newP.y, newP.z);
         // divEl.innerHTML = "Vel y : " + newVel.y;
         handleId = requestAnimationFrame(animate);
         renderer.render(scene, camera);
@@ -73,7 +77,7 @@ const Page = () => {
       animate();
       return () => cancelAnimationFrame(handleId);
     }
-  }, [isMounted]);
+  }, [isMounted, isLoaded]);
 
   useEffect(() => {
     const scene = createScene();
