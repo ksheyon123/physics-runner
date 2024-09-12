@@ -13,12 +13,18 @@ export const OptionBox = ({ onChangeValue }: IProps) => {
     <div className={styles["option-box-container"]}>
       {!isOpen && <div onClick={() => setIsOpen(true)}>Menu</div>}
       {isOpen && (
-        <div>
+        <ul className={styles["option-box-list"]}>
           {OPTION_BOX_ITEMS["free-fall"].map((props) => {
-            const { key, label, unit, renderer } = props;
-            return <>{!!renderer && renderer(props)}</>;
+            const { id, label, unit, renderer } = props;
+            return (
+              <li key={id}>
+                <div className={styles["item-label"]}>{label}</div>
+                <div className={styles["item-divider"]}>:</div>
+                {!!renderer && renderer(props)}
+              </li>
+            );
           })}
-        </div>
+        </ul>
       )}
     </div>
   );

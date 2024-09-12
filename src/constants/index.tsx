@@ -6,12 +6,13 @@ const TUTORIAL = "tutorial";
 type SortOfPath = "free-fall";
 
 export type OptionBoxItem = {
-  key: string;
+  id: string;
   label: string;
   unit: string;
-  min?: number;
-  max?: number;
+  min?: string | number;
+  max?: string | number;
   initValue?: number;
+  disabled?: boolean;
   renderer?: (props: any) => JSX.Element;
 };
 
@@ -32,7 +33,7 @@ export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {
   "free-fall": [
     {
       label: "Drag Coefficient",
-      key: "cd",
+      id: "cd",
       unit: "",
       min: 0,
       max: 1.25,
@@ -41,17 +42,20 @@ export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {
     },
     {
       label: "Gravity",
-      key: "g",
+      id: "g",
       unit: "m / s**2",
-      min: 0,
-      max: 0,
+      initValue: 9.81,
+      disabled: true,
+      renderer: (props: any) => <Gauge {...props} />,
     },
     {
       label: "Mass",
-      key: "mass",
+      id: "mass",
       unit: "kg",
-      min: 0,
-      max: 0,
+      min: 1,
+      max: 10,
+      initValue: 1,
+      renderer: (props: any) => <Gauge {...props} />,
     },
   ],
 };

@@ -3,3 +3,22 @@
   top: 0;
   right: 0;
 }
+
+.option-box-list {
+  padding: 0px;
+  margin: 0px;
+  list-style: none;
+}
+
+.option-box-list > li {
+  padding: 8px 4px;
+  display: flex;
+}
+
+.option-box-list > li > div.item-label {
+  width: 120px;
+}
+
+.option-box-list > li > div.item-divider {
+  width: 8px;
+}

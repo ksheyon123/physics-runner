@@ -8,15 +8,18 @@ interface IProps extends OptionBoxItem {
   onChangeValue: (key: string, event: ChangeEvent) => void;
 }
 
-export const Gauge = ({ key, min, max, initValue, onChangeValue }: IProps) => {
+export const Gauge = ({ id, min, max, initValue, onChangeValue }: IProps) => {
   const barRef = useRef<HTMLDivElement>(null);
 
-  const [range, changeRange] = useState<[number, number]>([min || 0, max || 0]);
+  const [range, changeRange] = useState<[string | number, string | number]>([
+    min || "0",
+    max || "0",
+  ]);
   const [value, setValue] = useState<number>();
 
   const [barPosition, setBarPosition] = useState<number>();
 
-  const onChangeRange = (key: "start" | "end", v: number) => {
+  const onChangeRange = (key: "start" | "end", v: string) => {
     changeRange((prv) => {
       if (key === "start") {
         return [v, prv[1]];
@@ -28,10 +31,15 @@ export const Gauge = ({ key, min, max, initValue, onChangeValue }: IProps) => {
 
   // cal 0 ~ 100 to range value
   const calRange = (p: number) => {
+    if (
+      Number(range[1]).toString() === "NaN" ||
+      Number(range[0]).toString() === "NaN"
+    )
+      return 0;
     // Get total range size
-    const t = range[1] - range[0];
+    const t = Number(range[1]) - Number(range[0]);
     // get real v
-    const c = t * p + range[0];
+    const c = t * p + Number(range[0]);
     return c;
   };
 
@@ -85,14 +93,12 @@ export const Gauge = ({ key, min, max, initValue, onChangeValue }: IProps) => {
   }, [barRef, setBarPosition]);
 
   return (
-    <div key={key} className={styles["gauge-container"]}>
+    <div key={id} className={styles["gauge-container"]}>
       <div className={styles["gauge-wrapper"]}>
         <div className={styles["gauge-range"]}>
           <input
             value={range[0]}
-            onChange={(e) =>
-              onChangeRange("start", Number(e.target.value || 0))
-            }
+            onChange={(e) => onChangeRange("start", e.target.value)}
           />
         </div>
         <div className={styles["gauge-controller"]}>
@@ -100,19 +106,19 @@ export const Gauge = ({ key, min, max, initValue, onChangeValue }: IProps) => {
             ref={barRef as RefObject<HTMLDivElement>}
             className={styles["gauge-background"]}
           >
-            <StyledBar barP={barPosition || 0} />
+            <StyledBar bar={barPosition || 0} />
           </div>
           <div className={styles["gauge-input"]}>
             <input
               value={value || initValue || 0}
-              onChange={(e) => onChangeInput(key, e)}
+              onChange={(e) => onChangeInput(id, e)}
             />
           </div>
         </div>
         <div className={styles["gauge-range"]}>
           <input
             value={range[1]}
-            onChange={(e) => onChangeRange("end", Number(e.target.value || 0))}
+            onChange={(e) => onChangeRange("end", e.target.value)}
           />
         </div>
       </div>
@@ -120,9 +126,9 @@ export const Gauge = ({ key, min, max, initValue, onChangeValue }: IProps) => {
   );
 };
 
-const StyledBar = styled.div<{ barP: number }>`
+const StyledBar = styled.div<{ bar: number }>`
   position: absolute;
-  left: ${(props) => props.barP}px;
+  left: ${(props) => props.bar}px;
   width: 10px;
   height: 20px;
   background-color: #ddd;
