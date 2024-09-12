@@ -35,8 +35,7 @@ const Page = () => {
     if (isMounted && isLoaded) {
       const scene = createScene();
       const camera = createCamera();
-      camera.position.set(0, 0, 10);
-      camera.lookAt(0, 0, 0);
+
       const renderer = createRenderer(
         window.innerWidth,
         window.innerHeight - 80
@@ -51,7 +50,6 @@ const Page = () => {
       const prevVel = new THREE.Vector3();
 
       const textMesh = createText(prevVel.y.toString());
-      console.log(textMesh);
       textMesh.position.set(2, 5, 0);
 
       scene.add(textMesh);
@@ -69,6 +67,9 @@ const Page = () => {
         prevVel.set(newVel.x, newVel.y, newVel.z);
         updateText(textMesh, newVel.y.toString());
         textMesh.position.set(2, newP.y, newP.z);
+
+        camera.position.set(0, newP.y, 10);
+        camera.lookAt(newP.x, newP.y, newP.z);
         // divEl.innerHTML = "Vel y : " + newVel.y;
         handleId = requestAnimationFrame(animate);
         renderer.render(scene, camera);

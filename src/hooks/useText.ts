@@ -45,13 +45,13 @@ export const useText = () => {
     const newGeometry = new TextGeometry(newText, {
       font: font,
       size: 0.2,
-      height: 0.05,
-      curveSegments: 12,
+      depth: 0.05,
+      curveSegments: 2,
       bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.02,
+      bevelThickness: 0.001,
+      bevelSize: 0.005,
       bevelOffset: 0,
-      bevelSegments: 5,
+      bevelSegments: 10,
     });
 
     // Assign the new geometry to the textMesh
