@@ -33,7 +33,7 @@ export const makeCylinder = (
 
 export const makeSphere = (radius?: number, seg?: number) => {
   const geometry = new THREE.SphereGeometry(radius || 5, seg || 32, seg || 32);
-  const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   const sphere = new THREE.Mesh(geometry, material);
   return sphere;
 };

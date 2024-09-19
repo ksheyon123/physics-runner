@@ -41,6 +41,7 @@ const Page = () => {
       let id: any;
       const animate = () => {
         id = requestAnimationFrame(animate);
+        renderer.render(scene, camera);
       };
 
       animate();
