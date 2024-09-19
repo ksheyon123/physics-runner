@@ -2,6 +2,7 @@ import { Gauge } from "@/components/Gauge/Gauge";
 
 const PHYSICS = "physics";
 const TUTORIAL = "tutorial";
+const MESH = "mesh";
 
 type SortOfPath = "free-fall";
 
@@ -19,14 +20,23 @@ export type OptionBoxItem = {
 export const NAV_PHYSICS_ITEMS = [
   { label: "Free Fall", key: 1, link: `${PHYSICS}/free-fall` },
   {
-    label: "energy",
+    label: "Potential Energy",
     key: 2,
     link: `${PHYSICS}/potential-kinetic`,
+  },
+  {
+    label: "Angular Momentum",
+    key: 3,
+    link: `${PHYSICS}/angular-momentum`,
   },
 ];
 
 export const NAV_TEST_ITEMS = [
   { label: "Collision", key: 1, link: `${TUTORIAL}/collision-check` },
+];
+
+export const MESH_TEST_ITEMS = [
+  { label: "Joint", key: 1, link: `${MESH}/joint` },
 ];
 
 export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {

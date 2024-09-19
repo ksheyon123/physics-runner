@@ -1,5 +1,6 @@
+import { group } from "console";
 import * as THREE from "three";
-
+import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 export const makeMesh = (
   width?: number,
   height?: number,
@@ -10,4 +11,33 @@ export const makeMesh = (
   const material = new THREE.MeshBasicMaterial({ color: color || 0x000000 });
   const cube = new THREE.Mesh(geometry, material);
   return cube;
+};
+
+export const makeCylinder = (
+  radius?: number,
+  height?: number,
+  seg?: number
+) => {
+  const geometry = new THREE.CylinderGeometry(
+    radius || 5,
+    radius || 5,
+    height || 20,
+    seg || 32
+  );
+
+  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  const cylinder = new THREE.Mesh(geometry, material);
+
+  return cylinder;
+};
+
+export const bindMesh = (meshes: THREE.Mesh[]) => {
+  const group = new THREE.Group();
+
+  for (let mesh of meshes) {
+    console.log(mesh);
+    group.add(mesh);
+  }
+
+  return group;
 };
