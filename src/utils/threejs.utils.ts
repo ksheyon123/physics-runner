@@ -31,11 +31,17 @@ export const makeCylinder = (
   return cylinder;
 };
 
+export const makeSphere = (radius?: number, seg?: number) => {
+  const geometry = new THREE.SphereGeometry(radius || 5, seg || 32, seg || 32);
+  const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  const sphere = new THREE.Mesh(geometry, material);
+  return sphere;
+};
+
 export const bindMesh = (meshes: THREE.Mesh[]) => {
   const group = new THREE.Group();
 
   for (let mesh of meshes) {
-    console.log(mesh);
     group.add(mesh);
   }
 

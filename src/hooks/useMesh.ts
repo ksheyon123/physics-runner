@@ -191,6 +191,9 @@ export const useMesh = () => {
     return new THREE.Vector3(0, dragForce, 0);
   };
 
+  // Angular Momentum = I * w (I : moment of inertia, w : 각속도 = r(position vector) X v() / r**2)
+  const angularMomentum = (v: THREE.Vector3) => {};
+
   return {
     createMesh,
 

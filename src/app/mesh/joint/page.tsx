@@ -9,6 +9,7 @@ import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
 import styled from "styled-components";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
+import { makeCylinder, makeMesh } from "@/utils/threejs.utils";
 
 const Page = () => {
   const { createCamera } = useCamera();
@@ -37,6 +38,8 @@ const Page = () => {
         window.innerHeight - 80
       );
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
+      const plane = makeMesh();
+      const cylinder = makeCylinder();
 
       let id: any;
       const animate = () => {
