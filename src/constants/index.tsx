@@ -29,6 +29,11 @@ export const NAV_PHYSICS_ITEMS = [
     key: 3,
     link: `${PHYSICS}/angular-momentum`,
   },
+  {
+    label: "Friction",
+    key: 4,
+    link: `${PHYSICS}/friction`,
+  },
 ];
 
 export const NAV_TEST_ITEMS = [
