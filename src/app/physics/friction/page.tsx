@@ -10,7 +10,12 @@ import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
 import styled from "styled-components";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
-import { bindMesh, makeMesh, makeSphere } from "@/utils/threejs.utils";
+import {
+  bindMesh,
+  makeMesh,
+  makeSphere,
+  colourMesh,
+} from "@/utils/threejs.utils";
 import { useRaycaster } from "@/hooks/useRaycaster";
 
 const Page = () => {
@@ -88,25 +93,29 @@ const Page = () => {
   }, [isMounted]);
 
   useEffect(() => {
-    if (isMounted) {
-      canvasRef.current!.addEventListener("mousemove", (e) => {
-        const { x, y } = calPointerCoord(e);
-        const intersects = rayCrossing(
-          { x, y },
-          cameraRef.current,
-          sceneRef.current
-          // "ball"
-        );
-        for (let i = 0; i < intersects.length; i++) {
-          intersects[i].object!.material.color.set(0x000000);
+    let obj: any;
+    const mousemove = (e: any) => {
+      const { x, y } = calPointerCoord(e);
+      const intersects = rayCrossing(
+        { x, y },
+        cameraRef.current,
+        sceneRef.current
+        // "ball"
+      );
+      if (intersects.length === 0) {
+        if (obj?.object) {
+          obj.object!.material.color.set(0xff00000);
         }
+      }
 
-        rendererRef.current.render(sceneRef.current, cameraRef.current);
-      });
+      obj = colourMesh(intersects, 0, "ball");
+
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
+    };
+    if (isMounted) {
+      canvasRef.current!.addEventListener("mousemove", mousemove);
       return () => {
-        canvasRef.current!.removeEventListener("mousemove", (e) => {
-          calPointerCoord(e);
-        });
+        canvasRef.current!.removeEventListener("mousemove", mousemove);
       };
     }
   }, [isMounted]);

@@ -47,3 +47,20 @@ export const bindMesh = (meshes: THREE.Mesh[]) => {
 
   return group;
 };
+
+export const colourMesh = (
+  intersects: "" | any[],
+  color = 0x000000,
+  filter?: string
+) => {
+  if (intersects === "") {
+  } else {
+    const l = intersects.filter((el) => el.object.name === filter);
+    for (let item of l) {
+      if (item?.object) {
+        item.object!.material.color.set(color);
+        return item;
+      }
+    }
+  }
+};

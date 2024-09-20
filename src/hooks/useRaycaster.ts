@@ -22,7 +22,6 @@ export const useRaycaster = (width: number, height: number, gap: number) => {
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(pointer, camera);
     let objs = scene.children;
-    console.log(objs);
     if (filter) {
       objs = scene.children.filter((el) => el.name === filter);
     }
