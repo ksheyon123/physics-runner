@@ -64,3 +64,76 @@ export const colourMesh = (
     }
   }
 };
+
+// Float32Array로 사각형 만들기
+export const box = () => {
+  // 연속하는 두 사각형의 꼭짓점 좌표 정의
+  // prettier-ignore
+  const vertices = new Float32Array([
+        // 첫 번째 사각형 (왼쪽)
+        -2.0, -1.0, 0.0, // 왼쪽 아래
+        0.0, -1.0, 0.0, // 오른쪽 아래
+        0.0, 1.0, 0.0, // 오른쪽 위
+        -2.0,  1.0, 0.0, // 왼쪽 위
+
+        // 두 번째 사각형 (오른쪽)
+        0.0, -1.0, 0.0, // 왼쪽 아래
+        2.0, -1.0, 0.0, // 오른쪽 아래
+        2.0, 1.0, 0.0, // 오른쪽 위
+        0.0, 1.0, 0.0, // 왼쪽 위
+      ]);
+
+  // 인덱스를 사용해 삼각형 4개로 2개의 사각형 구성 (각각 2개의 삼각형)
+  const indices = new Uint16Array([
+    // 첫 번째 사각형
+    0, 1, 2, 0, 2, 3,
+
+    // 두 번째 사각형
+    4, 5, 6, 4, 6, 7,
+  ]);
+
+  // BufferGeometry 생성 및 설정
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3)); // xyz로 3개씩
+  geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+  // 간단한 기본 재질 생성
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x00ff00,
+    side: THREE.DoubleSide,
+  });
+
+  // 사각형 메쉬 생성
+  const mesh = new THREE.Mesh(geometry, material);
+  return mesh;
+};
+
+export const quadratic = () => {
+  // 사각형 모양 정의
+  const shape = new THREE.Shape();
+
+  // 사각형의 왼쪽 아래 점에서 시작 (x, y)
+  shape.moveTo(-2, -1);
+
+  // 오른쪽 아래 점으로 이동
+  shape.lineTo(2, -1);
+
+  // 오른쪽 위로 이동
+  shape.lineTo(2, 1);
+
+  // 왼쪽 위로 곡선 그리기 (곡선을 정의하기 위해 `quadraticCurveTo` 사용)
+  shape.quadraticCurveTo(0, 2, -2, 1); // Control point (0, 2)로 곡선 그리기
+
+  // `ShapeGeometry`로 변환
+  const geometry = new THREE.ShapeGeometry(shape);
+
+  // 기본 재질 생성
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x00ff00,
+    side: THREE.DoubleSide,
+  });
+
+  // 메쉬 생성 및 장면에 추가
+  const mesh = new THREE.Mesh(geometry, material);
+  return mesh;
+};

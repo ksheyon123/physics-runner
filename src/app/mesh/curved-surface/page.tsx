@@ -36,6 +36,62 @@ const Page = () => {
     setIsMounted(true);
   }, []);
 
+  const slope = () => {
+    // Create the halfpipe geometry
+    const geometry = new THREE.BufferGeometry();
+
+    // Parameters for the halfpipe
+    const width = 10;
+    const depth = 5;
+    const height = 5;
+    const segments = 20; // More segments for a smoother curve
+
+    // Vertices array for the halfpipe
+    const vertices = [];
+
+    // Generate the vertices for the halfpipe
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments; // From 0 to 1 across the curve
+      const angle = Math.PI * t - Math.PI / 2; // Half-circle from -π/2 to π/2
+
+      const y = Math.sin(angle) * height; // Curved height
+      const z = Math.cos(angle) * depth; // Curved depth
+
+      // Left and right side vertices for each segment
+      vertices.push(-width / 2, y, z); // Left side
+      vertices.push(width / 2, y, z); // Right side
+    }
+
+    // Define the faces (triangles) for the halfpipe
+    const indices = [];
+    for (let i = 0; i < segments; i++) {
+      const a = i * 2;
+      const b = a + 1;
+      const c = a + 2;
+      const d = a + 3;
+
+      // Create two triangles per segment to form a quad (left and right faces)
+      indices.push(a, b, c);
+      indices.push(b, d, c);
+    }
+
+    // Set the positions and indices in the geometry
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(vertices), 3)
+    );
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals(); // Compute normals for lighting
+
+    // Create a material and mesh for the halfpipe
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x0077ff,
+      side: THREE.DoubleSide,
+    });
+    const halfpipe = new THREE.Mesh(geometry, material);
+    return halfpipe;
+  };
+
   useEffect(() => {
     if (isMounted) {
       console.log("IS LOADED");
@@ -45,32 +101,46 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      // Clipping Plane 설정
-      const clipPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+      // 사각형 모양 정의
+      const shape = new THREE.Shape();
 
-      // Box 생성
-      const boxGeometry = new THREE.BoxGeometry(5, 2, 2);
-      const boxMaterial = new THREE.MeshBasicMaterial({
-        color: 0xff0000,
+      // 사각형의 왼쪽 아래 점에서 시작 (x, y)
+      shape.moveTo(-2, -1);
+
+      // 오른쪽 아래 점으로 이동
+      shape.lineTo(2, -1);
+
+      // 오른쪽 위로 이동
+      shape.lineTo(2, 1);
+
+      // CubicBezierCurve를 사용해 왼쪽 위로 곡선 그리기
+      // 시작점 (2, 1), 끝점 (-2, 1), 제어점 두 개를 사용
+      const curve = new THREE.CubicBezierCurve(
+        new THREE.Vector2(2, 1), // 시작점
+        new THREE.Vector2(1, 2), // 첫 번째 제어점 (곡률 조정 가능)
+        new THREE.Vector2(-1, 2), // 두 번째 제어점 (곡률 조정 가능)
+        new THREE.Vector2(-2, 1) // 끝점
+      );
+
+      // 곡선 포인트를 얻어서 shape에 추가
+      const points = curve.getPoints(50); // 50은 곡선을 정의하는 세밀한 포인트 수
+      for (let i = 0; i < points.length; i++) {
+        const point = points[i];
+        shape.lineTo(point.x, point.y);
+      }
+
+      // `ShapeGeometry`로 변환
+      const geometry = new THREE.ShapeGeometry(shape);
+
+      // 기본 재질 생성
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
         side: THREE.DoubleSide,
-        clippingPlanes: [clipPlane],
       });
-      const box = new THREE.Mesh(boxGeometry, boxMaterial);
-      scene.add(box);
 
-      // Cylinder 생성
-      const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 5, 32);
-      const cylinderMaterial = new THREE.MeshBasicMaterial({
-        color: 0x808080,
-        side: THREE.DoubleSide,
-      });
-      const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-      cylinder.rotation.z = Math.PI / 2; // 원통 회전
-      cylinder.position.set(0, 0, 0); // 원통 위치 설정
-      scene.add(cylinder);
-
-      // 카메라 위치
-      camera.position.z = 10;
+      // 메쉬 생성 및 장면에 추가
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
 
       let id: any;
       const animate = () => {
