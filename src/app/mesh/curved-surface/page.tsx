@@ -101,46 +101,43 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      // 사각형 모양 정의
-      const shape = new THREE.Shape();
+      // 첫 번째 면: 곡선을 포함한 사각형 (직접 버퍼 지오메트리로 생성)
+      // prettier-ignore
+      const vertices = new Float32Array([
+        // 아래 직선 부분
+        -1.0, -1.0, 0.0, // 왼쪽 아래
+        1.0, -1.0, 0.0, // 오른쪽 아래
+        1.0, 1.0, 0.0, // 오른쪽 위
 
-      // 사각형의 왼쪽 아래 점에서 시작 (x, y)
-      shape.moveTo(-2, -1);
+        // 곡선 부분을 구성하는 점들 (3개의 점으로 예시)
+        0.8, 1.2, 0.0, // 오른쪽 곡선 제어점
+        0.0, 1.4, 0.0, // 중앙 곡선 제어점
+        -1.0, 1.0, 0.0, // 왼쪽 위
+      ]);
 
-      // 오른쪽 아래 점으로 이동
-      shape.lineTo(2, -1);
+      // 인덱스를 사용해 삼각형 4개로 사각형을 구성
+      // prettier-ignore
+      const indices = new Uint16Array([
+        0, 1, 2, // 첫 번째 삼각형 (직선 부분)
+        0, 2, 5, // 두 번째 삼각형 (곡선 부분 첫 번째)
+        2, 3, 5, // 세 번째 삼각형 (곡선 부분 두 번째)
+        3, 4, 5, // 네 번째 삼각형 (곡선 부분 세 번째)
+      ]);
 
-      // 오른쪽 위로 이동
-      shape.lineTo(2, 1);
-
-      // CubicBezierCurve를 사용해 왼쪽 위로 곡선 그리기
-      // 시작점 (2, 1), 끝점 (-2, 1), 제어점 두 개를 사용
-      const curve = new THREE.CubicBezierCurve(
-        new THREE.Vector2(2, 1), // 시작점
-        new THREE.Vector2(1, 2), // 첫 번째 제어점 (곡률 조정 가능)
-        new THREE.Vector2(-1, 2), // 두 번째 제어점 (곡률 조정 가능)
-        new THREE.Vector2(-2, 1) // 끝점
+      // BufferGeometry 생성 및 설정
+      const curvedGeometry = new THREE.BufferGeometry();
+      curvedGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(vertices, 3)
       );
-
-      // 곡선 포인트를 얻어서 shape에 추가
-      const points = curve.getPoints(50); // 50은 곡선을 정의하는 세밀한 포인트 수
-      for (let i = 0; i < points.length; i++) {
-        const point = points[i];
-        shape.lineTo(point.x, point.y);
-      }
-
-      // `ShapeGeometry`로 변환
-      const geometry = new THREE.ShapeGeometry(shape);
-
-      // 기본 재질 생성
-      const material = new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-        side: THREE.DoubleSide,
+      curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      //   // 첫 번째 면 재질 및 메쉬 생성
+      const curvedMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        wireframe: true,
       });
-
-      // 메쉬 생성 및 장면에 추가
-      const mesh = new THREE.Mesh(geometry, material);
-      scene.add(mesh);
+      const curvedMesh = new THREE.Mesh(curvedGeometry, curvedMaterial);
+      scene.add(curvedMesh);
 
       let id: any;
       const animate = () => {
@@ -157,6 +154,47 @@ const Page = () => {
       };
     }
   }, [isMounted]);
+
+  const secondPlane = () => {
+    // 두 번째 면: Float32Array로 생성한 사각형 (곡선 부분에 연결할 사각형)
+    const secondVertices = new Float32Array([
+      -2.0,
+      1.0,
+      0.0, // 왼쪽 아래 (곡선의 마지막 점과 맞춤)
+      2.0,
+      1.0,
+      0.0, // 오른쪽 아래 (곡선의 시작점과 맞춤)
+      2.0,
+      3.0,
+      0.0, // 오른쪽 위
+      -2.0,
+      3.0,
+      0.0, // 왼쪽 위
+    ]);
+
+    const secondIndices = new Uint16Array([
+      0,
+      1,
+      2, // 첫 번째 삼각형
+      0,
+      2,
+      3, // 두 번째 삼각형
+    ]);
+
+    const secondGeometry = new THREE.BufferGeometry();
+    secondGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(secondVertices, 3)
+    );
+    secondGeometry.setIndex(new THREE.BufferAttribute(secondIndices, 1));
+
+    // 두 번째 면 재질 및 메쉬 생성
+    const secondMaterial = new THREE.MeshBasicMaterial({
+      color: 0x0000ff,
+      side: THREE.DoubleSide,
+    });
+    const secondMesh = new THREE.Mesh(secondGeometry, secondMaterial);
+  };
 
   return (
     <ForwardedCanvas
