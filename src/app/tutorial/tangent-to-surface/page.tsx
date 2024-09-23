@@ -26,12 +26,6 @@ const Page = () => {
   const { createCamera } = useCamera();
   const { createRenderer, createScene } = useRenederer();
   const {} = useMesh();
-  const { isLoaded, createText } = useText();
-  const { rayCrossing, calPointerCoord } = useRaycaster(
-    canvasWidth,
-    canvasHeight,
-    gap
-  );
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +46,7 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
-    if (isMounted && isLoaded) {
+    if (isMounted) {
       console.log("IS LOADED");
       const camera = cameraRef.current;
       const renderer = rendererRef.current;
@@ -92,46 +86,7 @@ const Page = () => {
         cancelAnimationFrame(id);
       };
     }
-  }, [isMounted, isLoaded]);
-
-  useEffect(() => {
-    let obj: any;
-    let isShowing = false;
-    const text = createText("Center of the Mass");
-    text.position.set(1, 0, 0);
-    const mousemove = (e: any) => {
-      const { x, y } = calPointerCoord(e);
-      const intersects = rayCrossing(
-        { x, y },
-        cameraRef.current,
-        sceneRef.current
-        // "ball"
-      );
-      if (intersects.length === 0) {
-        if (obj?.object) {
-          obj.object!.material.color.set(0xff00000);
-        }
-        if (!isShowing) {
-          text.removeFromParent();
-          isShowing = false;
-        }
-      }
-
-      obj = colourMesh(intersects, 0, "ball");
-      if (isShowing) {
-        sceneRef.current.add(text);
-        isShowing = true;
-      }
-
-      rendererRef.current.render(sceneRef.current, cameraRef.current);
-    };
-    if (isMounted && isLoaded) {
-      canvasRef.current!.addEventListener("mousemove", mousemove);
-      return () => {
-        canvasRef.current!.removeEventListener("mousemove", mousemove);
-      };
-    }
-  }, [isMounted, isLoaded]);
+  }, [isMounted]);
 
   return (
     <ForwardedCanvas

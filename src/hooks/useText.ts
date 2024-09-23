@@ -20,7 +20,7 @@ export const useText = () => {
   }, []);
 
   const createText = (text: string) => {
-    const textGeometry = new TextGeometry("HELLO", {
+    const textGeometry = new TextGeometry(text, {
       font: font,
       size: 0.2,
       height: 0.05,
