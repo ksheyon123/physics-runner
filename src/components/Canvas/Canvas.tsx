@@ -22,4 +22,6 @@ const StyledDrawer = styled.div<{ width?: number; height?: number }>`
   position: relative;
   width: ${(props) => `${props.width}px`};
   height: ${(props) => `${props.height}px`};
+  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
 `;

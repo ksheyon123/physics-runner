@@ -27,7 +27,7 @@ const Page = () => {
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
-  const [coordinate, setCoordinate] = useState<number[]>([]);
+  const [vertices, setVertices] = useState<Float32Array>();
 
   const hz = 1 / 60; //seconds
 
@@ -38,18 +38,21 @@ const Page = () => {
     rendererRef.current = createRenderer(canvasWidth, canvasHeight);
     // (0, 0, 0)을 기준으로 반지름이 1인 반원
     // x**2 + y**2 = r**2
-    let coords = [0, 0, 0];
-    for (let x = -1; x <= 1; x = BigNumber(x).plus(0.1).toNumber()) {
-      const y = 1 - Math.pow(x, 2);
-      const newCoord = [x, y, 0];
-      coords = [...coords, ...newCoord];
+    let coords = [0, 0, 0, 1, 0, 0];
+    const numberOfPoints = 10;
+    for (let i = 0; i <= numberOfPoints; i++) {
+      const theta = (Math.PI * i) / numberOfPoints;
+      const x = Math.cos(theta);
+      const y = Math.sin(theta);
+      coords = [...coords, x, y, 0];
     }
-    setCoordinate(coords);
+    const tmp = new Float32Array(coords);
+    setVertices(tmp);
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (isMounted && coordinate?.length > 0) {
+    if (isMounted && vertices) {
       console.log("IS LOADED");
       const camera = cameraRef.current;
       const renderer = rendererRef.current;
@@ -57,19 +60,30 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      // prettier-ignore
-      const vertices = new Float32Array([
-        // 아래 직선 부분
-        0, 0, 0,
-        1, 0, // 왼쪽 아래
-        1.0, -1.0, 0.0, // 오른쪽 아래
-        1.0, 1.0, 0.0, // 오른쪽 위
+      const numberOfTriangle = vertices.length / 3;
 
-        // 곡선 부분을 구성하는 점들 (3개의 점으로 예시)
-        0.8, 1.2, 0.0, // 오른쪽 곡선 제어점
-        0.0, 1.4, 0.0, // 중앙 곡선 제어점
-        -1.0, 1.0, 0.0, // 왼쪽 위
-      ]);
+      let tmp: number[] = [];
+      for (let i = 1; i < numberOfTriangle - 1; i++) {
+        tmp = [...tmp, 0, i, i + 1];
+      }
+
+      // 인덱스를 사용해 삼각형을 연속시킴
+      const indices = new Uint16Array(tmp);
+
+      // BufferGeometry 생성 및 설정
+      const curvedGeometry = new THREE.BufferGeometry();
+      curvedGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(vertices, 3)
+      );
+      curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      //   // 첫 번째 면 재질 및 메쉬 생성
+      const curvedMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        wireframe: true,
+      });
+      const curvedMesh = new THREE.Mesh(curvedGeometry, curvedMaterial);
+      scene.add(curvedMesh);
 
       let id: any;
       const animate = () => {
@@ -85,7 +99,7 @@ const Page = () => {
         cancelAnimationFrame(id);
       };
     }
-  }, [isMounted, coordinate]);
+  }, [isMounted, vertices]);
 
   return (
     <ForwardedCanvas
