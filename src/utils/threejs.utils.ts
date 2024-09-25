@@ -141,11 +141,11 @@ export const getCirclePolarCoordinate = (
   numberOfPoints: number,
   PI: number
 ) => {
-  let coords = [0, 0, 0];
-
+  let coords: number[] = [];
+  const pn = PI < 0 ? -1 : 1;
   for (let i = 0; i <= numberOfPoints; i++) {
     const theta = (PI * i) / numberOfPoints;
-    const x = Math.cos(theta);
+    const x = pn * Math.cos(theta);
     const y = Math.sin(theta);
     coords = [...coords, x, y, 0];
   }
@@ -154,7 +154,8 @@ export const getCirclePolarCoordinate = (
 
 export const halfCircle = () => {
   const coords = getCirclePolarCoordinate(10, Math.PI);
-  const vertices = new Float32Array(coords);
+  console.log(coords);
+  const vertices = new Float32Array([0, 0, 0, ...coords]);
 
   const numberOfTriangle = vertices.length / 3;
 
