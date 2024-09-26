@@ -141,11 +141,14 @@ export const quadratic = () => {
  *
  * @param numberOfPoints 극좌표 / numberOfPoints (몇 분할)
  * @param PI 구할 구간
+ * @param z z 좌표
+ * @param start Polar coordinate 시작점
  * @returns
  */
 export const getCirclePolarCoordinate = (
   numberOfPoints: number,
   pi: number,
+  z: number = 0,
   start: number = 0
 ) => {
   let coords: number[] = [];
@@ -153,7 +156,7 @@ export const getCirclePolarCoordinate = (
     const theta = (pi / numberOfPoints) * i + start;
     const x = Math.cos(theta);
     const y = Math.sin(theta);
-    coords = [...coords, x, y, 0];
+    coords = [...coords, x, y, z];
   }
   return coords;
 };

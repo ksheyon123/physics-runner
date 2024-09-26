@@ -49,45 +49,50 @@ const Page = () => {
 
       // 반쪽
       // -2, 0, 0 | -2, -2, 0 | 0, -2, 0
-      const coords = getCirclePolarCoordinate(10, Math.PI / 2, Math.PI);
+      const coords0 = getCirclePolarCoordinate(10, Math.PI / 2, 0, Math.PI);
       // prettier-ignore
-      const vertices = new Float32Array([
+      const vertices0 = new Float32Array([
         -1.2, -1.2, 0,
         -1.2, 0, 0,
-        ...coords,
+        ...coords0,
         0, -1.2, 0,
       ]);
-      const numberOfTriangle = vertices.length / 3;
+      const numberOfTriangle = vertices0.length / 3;
 
-      console.log("numberOfTriangle", numberOfTriangle);
+      console.log("numberOfTriangle 1 : ", numberOfTriangle);
       let bindings: number[] = [];
       for (let i = 1; i < numberOfTriangle - 1; i++) {
         bindings = [...bindings, 0, i, i + 1];
       }
-      // // prettier-ignore
-      // const verticesForBox = new Float32Array([
-      //   0, -1.2, 0, // 마지막 코드 생략
-      //   0, -1, 0,
-      //   1, -1, 0,
-      //   1, -1.2, 0,
-      // ]);
-      // const combinedTypeArr = combineTypedArray(vertices, verticesForBox);
-      // // console.log(startOfIdx);
-      // bindings = [
-      //   ...bindings,
-      //   14,
-      //   15,
-      //   16,
-      //   14,
-      //   16,
-      //   17,
-      //   // numberOfTriangle,
-      //   // numberOfTriangle + 1,
-      //   // numberOfTriangle + 2,
-      //   // numberOfTriangle + 1,
-      //   // numberOfTriangle + 2,
-      //   // numberOfTriangle + 3,
-      // ];
+
+      // prettier-ignore
+      const verticesForBox = new Float32Array([
+        -1.2, -1.2, 0, // 마지막 코드 생략
+        -1.2, 0, 0,
+        -1.2, 0, 1,
+        -1.2, -1.2, 1,
+      ]);
+      const combinedTypeArr0 = combineTypedArray(vertices0, verticesForBox);
+      const numberOfTriangle2 = combinedTypeArr0.length / 3;
+      bindings = [...bindings, 14, 15, 16, 14, 16, 17];
+
+      const coords1 = getCirclePolarCoordinate(10, Math.PI / 2, 1, Math.PI);
+      console.log(coords1);
+      // prettier-ignore
+      const vertices1 = new Float32Array([
+        -1.2, 0, 1,
+        -1.2, -1.2, 1,
+        ...coords1,
+        0, -1.2, 1,
+      ]);
+
+      const combinedTypeArr1 = combineTypedArray(combinedTypeArr0, vertices1);
+
+      const numberOfTriangle3 = combinedTypeArr1.length / 3;
+
+      for (let i = numberOfTriangle2 - 1; i < numberOfTriangle3 - 1; i++) {
+        bindings = [...bindings, 19, i, i + 1];
+      }
 
       // 인덱스를 사용해 삼각형을 연속시킴
       const indices = new Uint16Array(bindings);
@@ -96,7 +101,7 @@ const Page = () => {
       const curvedGeometry = new THREE.BufferGeometry();
       curvedGeometry.setAttribute(
         "position",
-        new THREE.BufferAttribute(vertices, 3)
+        new THREE.BufferAttribute(combinedTypeArr1, 3)
       );
       curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
       //   // 첫 번째 면 재질 및 메쉬 생성
