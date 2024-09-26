@@ -49,7 +49,7 @@ const Page = () => {
 
       // 반쪽
       // -2, 0, 0 | -2, -2, 0 | 0, -2, 0
-      const coords = getCirclePolarCoordinate(10, -Math.PI / 2);
+      const coords = getCirclePolarCoordinate(10, Math.PI / 2, Math.PI);
       // prettier-ignore
       const vertices = new Float32Array([
         -1.2, -1.2, 0,
@@ -64,32 +64,30 @@ const Page = () => {
       for (let i = 1; i < numberOfTriangle - 1; i++) {
         bindings = [...bindings, 0, i, i + 1];
       }
-      console.log("bindings", bindings);
-      // prettier-ignore
-      const verticesForBox = new Float32Array([
-        0, -1.2, 0, // 마지막 코드 생략
-        0, -1, 0, 
-        1, -1, 0, 
-        1, -1.2, 0,
-      ]);
-      const combinedTypeArr = combineTypedArray(vertices, verticesForBox);
-      console.log(combinedTypeArr);
-      // console.log(startOfIdx);
-      bindings = [
-        ...bindings,
-        14,
-        15,
-        16,
-        14,
-        16,
-        17,
-        // numberOfTriangle,
-        // numberOfTriangle + 1,
-        // numberOfTriangle + 2,
-        // numberOfTriangle + 1,
-        // numberOfTriangle + 2,
-        // numberOfTriangle + 3,
-      ];
+      // // prettier-ignore
+      // const verticesForBox = new Float32Array([
+      //   0, -1.2, 0, // 마지막 코드 생략
+      //   0, -1, 0,
+      //   1, -1, 0,
+      //   1, -1.2, 0,
+      // ]);
+      // const combinedTypeArr = combineTypedArray(vertices, verticesForBox);
+      // // console.log(startOfIdx);
+      // bindings = [
+      //   ...bindings,
+      //   14,
+      //   15,
+      //   16,
+      //   14,
+      //   16,
+      //   17,
+      //   // numberOfTriangle,
+      //   // numberOfTriangle + 1,
+      //   // numberOfTriangle + 2,
+      //   // numberOfTriangle + 1,
+      //   // numberOfTriangle + 2,
+      //   // numberOfTriangle + 3,
+      // ];
 
       // 인덱스를 사용해 삼각형을 연속시킴
       const indices = new Uint16Array(bindings);
@@ -98,7 +96,7 @@ const Page = () => {
       const curvedGeometry = new THREE.BufferGeometry();
       curvedGeometry.setAttribute(
         "position",
-        new THREE.BufferAttribute(combinedTypeArr, 3)
+        new THREE.BufferAttribute(vertices, 3)
       );
       curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
       //   // 첫 번째 면 재질 및 메쉬 생성
