@@ -138,7 +138,7 @@ export const quadratic = () => {
 };
 
 /**
- *
+ * @description 선분을 N 등분하면 N+1 점이 생성된다
  * @param numberOfPoints 극좌표 / numberOfPoints (몇 분할)
  * @param PI 구할 구간
  * @param z z 좌표
@@ -159,6 +159,26 @@ export const getCirclePolarCoordinate = (
     coords = [...coords, x, y, z];
   }
   return coords;
+};
+
+/**
+ *
+ * @param bindings triangle index list
+ * @param fixed start point
+ * @param start from idx
+ * @param end end idx
+ * @returns
+ */
+export const setIndexFromSingleVertex = (
+  bindings: number[],
+  fixed: number,
+  start: number,
+  end: number
+) => {
+  for (let i = start; i < end; i++) {
+    bindings = [...bindings, fixed, i, i + 1];
+  }
+  return bindings;
 };
 
 export const halfCircle = () => {
