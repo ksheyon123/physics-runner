@@ -74,14 +74,15 @@ const Page = () => {
       ]);
       const combinedTypeArr0 = combineTypedArray(vertices0, verticesForBox);
       const numberOfTriangle2 = combinedTypeArr0.length / 3;
+      console.log("numberOfTriangle2", numberOfTriangle2);
       bindings = [...bindings, 14, 15, 16, 14, 16, 17];
 
       const coords1 = getCirclePolarCoordinate(10, Math.PI / 2, 1, Math.PI);
       console.log(coords1);
       // prettier-ignore
       const vertices1 = new Float32Array([
-        -1.2, 0, 1,
         -1.2, -1.2, 1,
+        -1.2, 0, 1,
         ...coords1,
         0, -1.2, 1,
       ]);
@@ -90,8 +91,8 @@ const Page = () => {
 
       const numberOfTriangle3 = combinedTypeArr1.length / 3;
 
-      for (let i = numberOfTriangle2 - 1; i < numberOfTriangle3 - 1; i++) {
-        bindings = [...bindings, 19, i, i + 1];
+      for (let i = numberOfTriangle2 + 1; i < numberOfTriangle3 - 1; i++) {
+        bindings = [...bindings, 18, i, i + 1];
       }
 
       // 인덱스를 사용해 삼각형을 연속시킴
