@@ -63,18 +63,6 @@ const Page = () => {
         bindings = [...bindings, 0, i, i + 1];
       }
 
-      // // prettier-ignore
-      // const verticesForBox = new Float32Array([
-      //   -1.2, -1.2, 0, // 마지막 코드 생략
-      //   -1.2, 0, 0,
-      //   -1.2, 0, 1,
-      //   -1.2, -1.2, 1,
-      // ]);
-      // const combinedTypeArr0 = combineTypedArray(vertices0, verticesForBox);
-      // const numberOfTriangle2 = combinedTypeArr0.length / 3;
-      // console.log("numberOfTriangle2", numberOfTriangle2);
-      // bindings = [...bindings, 14, 15, 16, 14, 16, 17];
-
       const coords1 = getCirclePolarCoordinate(10, Math.PI / 2, 1, Math.PI);
       console.log(coords1);
       // prettier-ignore
@@ -95,11 +83,12 @@ const Page = () => {
       // prettier-ignore
       bindings = [
         ...bindings, 
+        // 뒷 판
         0, 14, 15, 
         0, 15, 1, 
         1, 15, 2, 
         1, 16, 2,
-        // Slope
+        // Slope 
         2, 16, 17,
         2, 17, 3,
         3, 17, 18, 

@@ -164,19 +164,17 @@ export const getCirclePolarCoordinate = (
 /**
  *
  * @param bindings triangle index list
- * @param fixed start point
- * @param start from idx
- * @param end end idx
+ * @param start start point
+ * @param total end idx
  * @returns
  */
 export const setIndexFromSingleVertex = (
   bindings: number[],
-  fixed: number,
   start: number,
-  end: number
+  total: number
 ) => {
-  for (let i = start; i < end; i++) {
-    bindings = [...bindings, fixed, i, i + 1];
+  for (let i = start; i < total; i++) {
+    bindings = [...bindings, start, i + 1, i + 2];
   }
   return bindings;
 };

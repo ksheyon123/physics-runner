@@ -9,6 +9,8 @@ import { useCamera } from "@/hooks/useCamera";
 import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
+import { combineTypedArray } from "@/utils/utils";
+import { setIndexFromSingleVertex } from "@/utils/threejs.utils";
 
 const Page = () => {
   const gap = 80;
@@ -101,34 +103,39 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      // 첫 번째 면: 곡선을 포함한 사각형 (직접 버퍼 지오메트리로 생성)
       // prettier-ignore
-      const vertices = new Float32Array([
-        // 아래 직선 부분
-        -1.0, -1.0, 0.0, // 왼쪽 아래
-        1.0, -1.0, 0.0, // 오른쪽 아래
-        1.0, 1.0, 0.0, // 오른쪽 위
+      const initVertex = [
+        -0.5, -0.5, 0, 
+        -0.5, 1, 0, 
+        0, 1, 0, 
+        1, 0, 0, 
+        1, -0.5, 0,
+      ];
 
-        // 곡선 부분을 구성하는 점들 (3개의 점으로 예시)
-        0.8, 1.2, 0.0, // 오른쪽 곡선 제어점
-        0.0, 1.4, 0.0, // 중앙 곡선 제어점
-        -1.0, 1.0, 0.0, // 왼쪽 위
-      ]);
+      // Single Plane
+      const typedArray0 = new Float32Array(initVertex);
+      const numberOfIndex = initVertex.length / 3; // 5개의 좌표
 
-      // 인덱스를 사용해 삼각형 4개로 사각형을 구성
-      // prettier-ignore
-      const indices = new Uint16Array([
-        0, 1, 2, // 첫 번째 삼각형 (직선 부분)
-        0, 2, 5, // 두 번째 삼각형 (곡선 부분 첫 번째)
-        2, 3, 5, // 세 번째 삼각형 (곡선 부분 두 번째)
-        3, 4, 5, // 네 번째 삼각형 (곡선 부분 세 번째)
-      ]);
+      let bindings: number[] = [];
 
-      // BufferGeometry 생성 및 설정
+      bindings = setIndexFromSingleVertex(bindings, 0, numberOfIndex - 2);
+      console.log(bindings);
+
+      // const typedArray1 = new Float32Array(
+      //   initVertex.map((d, idx) => ((idx + 1) % 3 === 0 ? d + 3 : d))
+      // );
+
+      // const bindedTypeArray = combineTypedArray(typedArray0, typedArray1);
+      // const numberOfIndex1 = bindedTypeArray.length;
+
+      // bindings = setIndexFromSingleVertex(bindings, 5, numberOfIndex1);
+
+      const indices = new Uint16Array(bindings);
+
       const curvedGeometry = new THREE.BufferGeometry();
       curvedGeometry.setAttribute(
         "position",
-        new THREE.BufferAttribute(vertices, 3)
+        new THREE.BufferAttribute(typedArray0, 3)
       );
       curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
       //   // 첫 번째 면 재질 및 메쉬 생성
