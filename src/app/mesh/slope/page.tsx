@@ -10,7 +10,10 @@ import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 import { combineTypedArray } from "@/utils/utils";
-import { setIndexFromSingleVertex } from "@/utils/threejs.utils";
+import {
+  setIndexBetweenPlane,
+  setIndexFromSingleVertex,
+} from "@/utils/threejs.utils";
 
 const Page = () => {
   const gap = 80;
@@ -118,24 +121,28 @@ const Page = () => {
 
       let bindings: number[] = [];
 
-      bindings = setIndexFromSingleVertex(bindings, 0, numberOfIndex - 2);
-      console.log(bindings);
+      bindings = setIndexFromSingleVertex(bindings, 0, numberOfIndex);
 
-      // const typedArray1 = new Float32Array(
-      //   initVertex.map((d, idx) => ((idx + 1) % 3 === 0 ? d + 3 : d))
-      // );
+      const typedArray1 = new Float32Array(
+        initVertex.map((d, idx) => ((idx + 1) % 3 === 0 ? d + 3 : d))
+      );
 
-      // const bindedTypeArray = combineTypedArray(typedArray0, typedArray1);
-      // const numberOfIndex1 = bindedTypeArray.length;
+      const bindedTypeArray = combineTypedArray(typedArray0, typedArray1);
+      const numberOfIndex1 = bindedTypeArray.length / 3;
 
-      // bindings = setIndexFromSingleVertex(bindings, 5, numberOfIndex1);
+      bindings = setIndexFromSingleVertex(bindings, 5, numberOfIndex1);
+      bindings = setIndexBetweenPlane(bindings, 0, 5);
+      bindings = setIndexBetweenPlane(bindings, 1, 5);
+      bindings = setIndexBetweenPlane(bindings, 2, 5);
+      bindings = setIndexBetweenPlane(bindings, 3, 5);
+      bindings = setIndexBetweenPlane(bindings, 4, 5);
 
       const indices = new Uint16Array(bindings);
 
       const curvedGeometry = new THREE.BufferGeometry();
       curvedGeometry.setAttribute(
         "position",
-        new THREE.BufferAttribute(typedArray0, 3)
+        new THREE.BufferAttribute(bindedTypeArray, 3)
       );
       curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
       //   // 첫 번째 면 재질 및 메쉬 생성

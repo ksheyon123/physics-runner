@@ -173,9 +173,30 @@ export const setIndexFromSingleVertex = (
   start: number,
   total: number
 ) => {
-  for (let i = start; i < total; i++) {
-    bindings = [...bindings, start, i + 1, i + 2];
+  for (let i = start + 1; i < total - 1; i++) {
+    bindings = [...bindings, start, i, i + 1];
   }
+  return bindings;
+};
+
+// 어렵네
+export const setIndexBetweenPlane = (
+  bindings: number[],
+  startIdx: number,
+  gap: number
+) => {
+  const adjacent = startIdx + 1;
+  bindings = [
+    ...bindings,
+    // First Triangle
+    startIdx,
+    adjacent % gap,
+    (adjacent % gap) + gap,
+    // Second Triangle
+    startIdx,
+    (adjacent % gap) + gap,
+    startIdx + gap,
+  ];
   return bindings;
 };
 
