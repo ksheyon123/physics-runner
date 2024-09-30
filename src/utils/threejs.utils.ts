@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { combineTypedArray } from "./utils";
 
-export const makePlane = (w: number, h: number) => {
+export const makePlane = (w: number, h: number, color: number) => {
   const geometry = new THREE.PlaneGeometry(w, h);
   const material = new THREE.MeshBasicMaterial({
-    color: 0xffff00,
+    color: color || 0xffff00,
     wireframe: true,
   });
   const plane = new THREE.Mesh(geometry, material);
@@ -26,7 +26,8 @@ export const makeMesh = (
 export const makeCylinder = (
   radius?: number,
   height?: number,
-  seg?: number
+  seg?: number,
+  color?: number
 ) => {
   const geometry = new THREE.CylinderGeometry(
     radius || 5,
@@ -35,7 +36,7 @@ export const makeCylinder = (
     seg || 32
   );
 
-  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  const material = new THREE.MeshBasicMaterial({ color: color || 0xffff00 });
   const cylinder = new THREE.Mesh(geometry, material);
 
   return cylinder;
@@ -273,3 +274,18 @@ export const halfCircle = () => {
   const curvedMesh = new THREE.Mesh(curvedGeometry, curvedMaterial);
   return curvedMesh;
 };
+
+export const getHemiSpherePoint = (
+  radius: number,
+  theta: number,
+  phi: number
+) => {
+  // 구 좌표를 데카르트 좌표로 변환
+  let x = radius * Math.sin(phi) * Math.cos(theta);
+  let y = radius * Math.cos(phi);
+  let z = radius * Math.sin(phi) * Math.sin(theta);
+
+  return { x, y, z };
+};
+
+export const getHemiSphereAngle = () => {};

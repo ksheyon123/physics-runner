@@ -9,7 +9,11 @@ import { useCamera } from "@/hooks/useCamera";
 import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
-import { makePlane } from "@/utils/threejs.utils";
+import {
+  getHemiSpherePoint,
+  makeCylinder,
+  makePlane,
+} from "@/utils/threejs.utils";
 
 const Page = () => {
   const gap = 80;
@@ -46,16 +50,41 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      const plane = makePlane(10, 10);
-      plane.rotateX(90);
+      const plane = makePlane(20, 20, 0x00ff00);
+      plane.rotateX(Math.PI / 2);
       scene.add(plane);
+
+      const height = 4;
+
+      const p = { x: 0, y: 1, z: 0 };
+      const cylinder0 = makeCylinder(1, height, 32);
+      cylinder0.geometry.translate(0, height / 2, 0);
+      cylinder0.position.set(p.x, p.y, p.z);
+      cylinder0.rotateZ(-Math.PI / 2);
+      scene.add(cylinder0);
+
+      const cylinder1 = makeCylinder(1, 2, 32, 0xff00000);
+      cylinder1.geometry.translate(0, 1, 0);
+      cylinder1.position.set(4.5, p.y, p.z);
+      cylinder1.rotateZ(-Math.PI / 2);
+      scene.add(cylinder1);
+
+      // 세타: 0에서 2π 사이의 임의의 값 (방위각)
+      // 파이: 0에서 π/2 사이의 임의의 값 (고도각)
 
       let id: any;
       const animate = () => {
         controls.update();
 
+        cylinder0.rotateZ(-0.01);
+        const { x, y, z } = getHemiSpherePoint(4.5, 0, -cylinder0.rotation.z);
+
+        cylinder1.position.set(x, y + 1, z);
+
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
+
+        cylinder0.rotation.z = cylinder0.rotation.z % (Math.PI / 2);
       };
 
       animate();
