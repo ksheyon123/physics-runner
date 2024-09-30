@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { combineTypedArray } from "./utils";
 
-export const makePlane = (w: number, h: number, color: number) => {
+export const makePlane = (w: number, h: number, color?: number) => {
   const geometry = new THREE.PlaneGeometry(w, h);
   const material = new THREE.MeshBasicMaterial({
     color: color || 0xffff00,
@@ -42,9 +42,27 @@ export const makeCylinder = (
   return cylinder;
 };
 
-export const makeSphere = (radius?: number, seg?: number) => {
-  const geometry = new THREE.SphereGeometry(radius || 5, seg || 32, seg || 32);
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+export const makeSphere = (
+  radius?: number,
+  seg?: number,
+  phiStart?: number,
+  phiLength?: number,
+  thetaStart?: number,
+  thetaLength?: number
+) => {
+  const geometry = new THREE.SphereGeometry(
+    radius || 5,
+    seg || 32,
+    seg || 32,
+    phiStart || 0,
+    phiLength || 2 * Math.PI,
+    thetaStart || 0,
+    thetaLength || Math.PI
+  );
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xff0000,
+    wireframe: true,
+  });
   const sphere = new THREE.Mesh(geometry, material);
   return sphere;
 };
@@ -288,4 +306,4 @@ export const getHemiSpherePoint = (
   return { x, y, z };
 };
 
-export const getHemiSphereAngle = () => {};
+export const getQuaternion = () => {};

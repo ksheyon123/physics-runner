@@ -11,8 +11,9 @@ import { useMesh } from "@/hooks/useMesh";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 import {
   getHemiSpherePoint,
-  makeCylinder,
+  makeMesh,
   makePlane,
+  makeSphere,
 } from "@/utils/threejs.utils";
 
 const Page = () => {
@@ -50,49 +51,42 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      const plane = makePlane(20, 20, 0x00ff00);
+      // Make Plane to clear the coordinate
+      const plane = makePlane(10, 10, 0x000000);
       plane.rotateX(Math.PI / 2);
       scene.add(plane);
 
-      const height = 4;
+      const radius = 3;
+      const sphere = makeSphere(radius, 32, 0, 0, 0, Math.PI / 2);
+      scene.add(sphere);
 
-      const p = { x: 0, y: 1, z: 0 };
-      const cylinder0 = makeCylinder(1, height, 32);
-      cylinder0.geometry.translate(0, height / 2, 0);
-      cylinder0.position.set(p.x, p.y, p.z);
-      cylinder0.rotateZ(-Math.PI / 2);
-      scene.add(cylinder0);
+      const box = makeMesh(1, 1, 1, 0xff0000);
+      box.position.set(0, 3, 0);
+      scene.add(box);
 
-      const cylinder1 = makeCylinder(1, 2, 32, 0xff00000);
-      cylinder1.geometry.translate(0, 1, 0);
-      cylinder1.position.set(4.5, p.y, p.z);
-      cylinder1.rotateZ(-Math.PI / 2);
-      scene.add(cylinder1);
+      let theta = 0;
+      let phi = Math.PI / 2;
 
-      // 세타: 0에서 2π 사이의 임의의 값 (방위각)
-      // 파이: 0에서 π/2 사이의 임의의 값 (고도각)
-
-      let d = -1;
       let id: any;
       const animate = () => {
         controls.update();
 
-        cylinder0.rotateZ(d * 0.004);
-        const { x, y, z } = getHemiSpherePoint(4.5, 0, -cylinder0.rotation.z);
+        // 새로운 Quaternion을 만듭니다.
+        const quaternion = new THREE.Quaternion();
+        const { x, y, z } = getHemiSpherePoint(radius, theta, phi);
+        // 회전축(x, y, z)와 회전 각도를 설정합니다.
+        const axis = new THREE.Vector3(x, y, z); // y축
+        const angle = Math.PI / 4; // 45도
 
-        cylinder1.position.set(x, y + 1, z);
-        cylinder1.rotateZ(d * 0.004);
-
+        // Quaternion을 회전축과 각도로 설정합니다.
+        quaternion.setFromAxisAngle(axis, angle);
+        box.position.set(x, y, z);
+        box.quaternion.copy(quaternion);
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
 
-        if (cylinder0.rotation.z < -Math.PI / 2) {
-          d = d * -1;
-        }
-
-        if (cylinder0.rotation.z > 0) {
-          d = d * -1;
-        }
+        theta += 0.001;
+        phi += 0.005;
       };
 
       animate();
