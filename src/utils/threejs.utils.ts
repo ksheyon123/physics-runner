@@ -1,4 +1,15 @@
 import * as THREE from "three";
+import { combineTypedArray } from "./utils";
+
+export const makePlane = (w: number, h: number) => {
+  const geometry = new THREE.PlaneGeometry(w, h);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffff00,
+    wireframe: true,
+  });
+  const plane = new THREE.Mesh(geometry, material);
+  return plane;
+};
 
 export const makeMesh = (
   width?: number,
@@ -135,6 +146,38 @@ export const quadratic = () => {
   // 메쉬 생성 및 장면에 추가
   const mesh = new THREE.Mesh(geometry, material);
   return mesh;
+};
+
+export const carvedBox = (first: number[], second: number[]) => {
+  // Single Plane
+  const typedArray0 = new Float32Array(first);
+  const numberOfIndex = typedArray0.length / 3; // 5개의 좌표
+  const typedArray1 = new Float32Array(second);
+  const bindedTypeArray = combineTypedArray(typedArray0, typedArray1);
+  const numberOfIndex1 = bindedTypeArray.length / 3;
+
+  let bindings: number[] = [];
+  bindings = setIndexFromSingleVertex(bindings, 0, numberOfIndex);
+  bindings = setIndexFromSingleVertex(bindings, numberOfIndex, numberOfIndex1);
+  for (let i = 0; i < numberOfIndex; i++) {
+    bindings = setIndexBetweenPlane(bindings, i, numberOfIndex);
+  }
+
+  const indices = new Uint16Array(bindings);
+
+  const curvedGeometry = new THREE.BufferGeometry();
+  curvedGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(bindedTypeArray, 3)
+  );
+  curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
+  //   // 첫 번째 면 재질 및 메쉬 생성
+  const curvedMaterial = new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    wireframe: true,
+  });
+  const curvedMesh = new THREE.Mesh(curvedGeometry, curvedMaterial);
+  return curvedMesh;
 };
 
 /**

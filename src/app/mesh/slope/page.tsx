@@ -11,6 +11,7 @@ import { useMesh } from "@/hooks/useMesh";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 import { combineTypedArray } from "@/utils/utils";
 import {
+  carvedBox,
   setIndexBetweenPlane,
   setIndexFromSingleVertex,
 } from "@/utils/threejs.utils";
@@ -107,52 +108,32 @@ const Page = () => {
       const controls = new OrbitControls(camera, renderer.domElement);
 
       // prettier-ignore
-      const initVertex = [
-        -0.5, -0.5, 0, 
-        -0.5, 1, 0, 
-        0, 1, 0, 
-        1, 0, 0, 
+      const firstVertices0 = [
+        -0.5, -0.5, 0,
+        -0.5, 1, 0,
+        0, 1, 0,
+        1, 0, 0,
         1, -0.5, 0,
       ];
+      const secondVertices0 = firstVertices0.map((d, idx) =>
+        (idx + 1) % 3 === 0 ? d + 3 : d
+      );
+      const mesh0 = carvedBox(firstVertices0, secondVertices0);
+      scene.add(mesh0);
 
-      // Single Plane
-      const typedArray0 = new Float32Array(initVertex);
-      const numberOfIndex = initVertex.length / 3; // 5개의 좌표
-
-      let bindings: number[] = [];
-
-      bindings = setIndexFromSingleVertex(bindings, 0, numberOfIndex);
-
-      const typedArray1 = new Float32Array(
-        initVertex.map((d, idx) => ((idx + 1) % 3 === 0 ? d + 3 : d))
+      // prettier-ignore
+      const firstVertices1 = [
+       1, -0.5, 0,
+       1, 0, 0,
+       3, 0, 0, 
+       3, -0.5, 0
+      ];
+      const secondVertices1 = firstVertices1.map((d, idx) =>
+        (idx + 1) % 3 === 0 ? d + 3 : d
       );
 
-      const bindedTypeArray = combineTypedArray(typedArray0, typedArray1);
-      const numberOfIndex1 = bindedTypeArray.length / 3;
-
-      bindings = setIndexFromSingleVertex(bindings, 5, numberOfIndex1);
-      bindings = setIndexBetweenPlane(bindings, 0, 5);
-      bindings = setIndexBetweenPlane(bindings, 1, 5);
-      bindings = setIndexBetweenPlane(bindings, 2, 5);
-      bindings = setIndexBetweenPlane(bindings, 3, 5);
-      bindings = setIndexBetweenPlane(bindings, 4, 5);
-
-      const indices = new Uint16Array(bindings);
-
-      const curvedGeometry = new THREE.BufferGeometry();
-      curvedGeometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(bindedTypeArray, 3)
-      );
-      curvedGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
-      //   // 첫 번째 면 재질 및 메쉬 생성
-      const curvedMaterial = new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        wireframe: true,
-      });
-      const curvedMesh = new THREE.Mesh(curvedGeometry, curvedMaterial);
-      scene.add(curvedMesh);
-
+      const mesh1 = carvedBox(firstVertices1, secondVertices1);
+      scene.add(mesh1);
       let id: any;
       const animate = () => {
         controls.update();
