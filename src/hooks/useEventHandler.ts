@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import * as THREE from "three";
 import { useRaycaster } from "./useRaycaster";
 import { colourMesh } from "@/utils/threejs.utils";
+import { polarToCartesian } from "@/utils/math.utils";
 
 export const useEventHandler = (
   canvas: HTMLDivElement | null,
@@ -48,7 +49,18 @@ export const useEventHandler = (
       const hasIntersaction = intersections.length === 0;
 
       if (hasIntersaction && isClicked) {
-        console.log(e.movementY);
+        const [b] = scene.children.filter((e) => e.name === "cylinder");
+        if (e.movementY > 0) {
+          b.rotateZ(-0.004);
+          const { x, y } = polarToCartesian(2.5, 0, -b.rotation.z);
+          obj.object.position.set(x, y, 0);
+        }
+
+        if (e.movementY < 0) {
+          b.rotateZ(0.004);
+          const { x, y } = polarToCartesian(2.5, 0, -b.rotation.z);
+          obj.object.position.set(x, y, 0);
+        }
         return;
       }
 

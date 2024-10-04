@@ -84,6 +84,7 @@ const Page = () => {
       cylinder0.geometry.translate(0, height / 2, 0);
       cylinder0.position.set(0, 0, 0);
       cylinder0.rotateZ(-Math.PI / 2);
+      cylinder0.name = "cylinder";
       scene.add(cylinder0);
 
       // const cylinder1 = makeCylinder(1, height, 32, 0x0000ff);
@@ -105,7 +106,6 @@ const Page = () => {
       let id: any;
       const animate = () => {
         // controls.update();
-
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
       };
