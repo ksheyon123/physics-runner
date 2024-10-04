@@ -79,7 +79,7 @@ export const bindMesh = (meshes: THREE.Mesh[]) => {
 
 export const colourMesh = (
   intersects: "" | any[],
-  color = 0x000000,
+  color = 0x00ff00,
   filter?: string
 ) => {
   if (intersects === "") {

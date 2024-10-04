@@ -15,6 +15,7 @@ import {
   makePlane,
   makeSphere,
 } from "@/utils/threejs.utils";
+import { useEventHandler } from "@/hooks/useEventHandler";
 
 const Page = () => {
   const gap = 80;
@@ -31,6 +32,14 @@ const Page = () => {
   const rendererRef = useRef<any>(null);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  useEventHandler(
+    canvasRef.current,
+    rendererRef.current,
+    cameraRef.current,
+    sceneRef.current,
+    isMounted
+  );
 
   const hz = 1 / 60; //seconds
 
@@ -55,19 +64,21 @@ const Page = () => {
       plane.rotateX(Math.PI / 2);
       scene.add(plane);
 
-      const height = 4;
+      const height = 2;
       const gap = 1;
 
       const joint0 = makeSphere(1, 32);
+      joint0.name = "joint";
       scene.add(joint0);
 
       const joint1 = makeSphere(1, 32);
       joint1.position.set(height + gap / 2, 0, 0);
+      joint1.name = "joint";
       scene.add(joint1);
 
-      const joint2 = makeSphere(1, 32);
-      joint2.position.set(height + gap + height / 2 + gap / 2, 0, 0);
-      scene.add(joint2);
+      // const joint2 = makeSphere(1, 32);
+      // joint2.position.set(height + gap + height + gap / 2, 0, 0);
+      // scene.add(joint2);
 
       const cylinder0 = makeCylinder(1, height, 32, 0x0000ff);
       cylinder0.geometry.translate(0, height / 2, 0);
@@ -75,17 +86,17 @@ const Page = () => {
       cylinder0.rotateZ(-Math.PI / 2);
       scene.add(cylinder0);
 
-      const cylinder1 = makeCylinder(1, height / 2, 32, 0x0000ff);
-      cylinder1.geometry.translate(0, height / 4, 0);
-      cylinder1.position.set(height + gap, 0, 0);
-      cylinder1.rotateZ(-Math.PI / 2);
-      scene.add(cylinder1);
+      // const cylinder1 = makeCylinder(1, height, 32, 0x0000ff);
+      // cylinder1.geometry.translate(0, height / 2, 0);
+      // cylinder1.position.set(height + gap, 0, 0);
+      // cylinder1.rotateZ(-Math.PI / 2);
+      // scene.add(cylinder1);
 
-      const cylinder2 = makeCylinder(1, height / 4, 32, 0x0000ff);
-      cylinder2.geometry.translate(0, height / 8, 0);
-      cylinder2.position.set(height + gap + height / 2 + gap, 0, 0);
-      cylinder2.rotateZ(-Math.PI / 2);
-      scene.add(cylinder2);
+      // const cylinder2 = makeCylinder(1, height, 32, 0x0000ff);
+      // cylinder2.geometry.translate(0, height / 2, 0);
+      // cylinder2.position.set(height + gap + height + gap, 0, 0);
+      // cylinder2.rotateZ(-Math.PI / 2);
+      // scene.add(cylinder2);
 
       // 세타: 0에서 2π 사이의 임의의 값 (방위각)
       // 파이: 0에서 π/2 사이의 임의의 값 (고도각)
