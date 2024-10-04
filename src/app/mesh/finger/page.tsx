@@ -13,6 +13,7 @@ import {
   getHemiSpherePoint,
   makeCylinder,
   makePlane,
+  makeSphere,
 } from "@/utils/threejs.utils";
 
 const Page = () => {
@@ -55,19 +56,36 @@ const Page = () => {
       scene.add(plane);
 
       const height = 4;
+      const gap = 1;
 
-      const p = { x: 0, y: 1, z: 0 };
-      const cylinder0 = makeCylinder(1, height, 32);
+      const joint0 = makeSphere(1, 32);
+      scene.add(joint0);
+
+      const joint1 = makeSphere(1, 32);
+      joint1.position.set(height + gap / 2, 0, 0);
+      scene.add(joint1);
+
+      const joint2 = makeSphere(1, 32);
+      joint2.position.set(height + gap + height / 2 + gap / 2, 0, 0);
+      scene.add(joint2);
+
+      const cylinder0 = makeCylinder(1, height, 32, 0x0000ff);
       cylinder0.geometry.translate(0, height / 2, 0);
-      cylinder0.position.set(p.x, p.y, p.z);
+      cylinder0.position.set(0, 0, 0);
       cylinder0.rotateZ(-Math.PI / 2);
       scene.add(cylinder0);
 
-      const cylinder1 = makeCylinder(1, 2, 32, 0xff00000);
-      cylinder1.geometry.translate(0, 1, 0);
-      cylinder1.position.set(4.5, p.y, p.z);
+      const cylinder1 = makeCylinder(1, height / 2, 32, 0x0000ff);
+      cylinder1.geometry.translate(0, height / 4, 0);
+      cylinder1.position.set(height + gap, 0, 0);
       cylinder1.rotateZ(-Math.PI / 2);
       scene.add(cylinder1);
+
+      const cylinder2 = makeCylinder(1, height / 4, 32, 0x0000ff);
+      cylinder2.geometry.translate(0, height / 8, 0);
+      cylinder2.position.set(height + gap + height / 2 + gap, 0, 0);
+      cylinder2.rotateZ(-Math.PI / 2);
+      scene.add(cylinder2);
 
       // 세타: 0에서 2π 사이의 임의의 값 (방위각)
       // 파이: 0에서 π/2 사이의 임의의 값 (고도각)
@@ -77,22 +95,8 @@ const Page = () => {
       const animate = () => {
         controls.update();
 
-        cylinder0.rotateZ(d * 0.004);
-        const { x, y, z } = getHemiSpherePoint(4.5, 0, -cylinder0.rotation.z);
-
-        cylinder1.position.set(x, y + 1, z);
-        cylinder1.rotateZ(d * 0.004);
-
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
-
-        if (cylinder0.rotation.z < -Math.PI / 2) {
-          d = d * -1;
-        }
-
-        if (cylinder0.rotation.z > 0) {
-          d = d * -1;
-        }
       };
 
       animate();
