@@ -58,7 +58,7 @@ const Page = () => {
       const renderer = rendererRef.current;
       const scene = sceneRef.current;
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
-      const controls = new OrbitControls(camera, renderer.domElement);
+      // const controls = new OrbitControls(camera, renderer.domElement);
 
       const plane = makePlane(20, 20, 0x00ff00);
       plane.rotateX(Math.PI / 2);
@@ -104,7 +104,7 @@ const Page = () => {
       let d = -1;
       let id: any;
       const animate = () => {
-        controls.update();
+        // controls.update();
 
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);

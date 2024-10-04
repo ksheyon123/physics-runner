@@ -19,26 +19,58 @@ export const useEventHandler = (
   useEffect(() => {
     if (!canvas || !isReady || !renderer || !camera || !scene) return;
     console.log("Event Attached");
-    let obj: any;
 
-    const mousedonwEvent = (e: MouseEvent) => {};
+    const defaultColor = 0xff0000;
+    const hoverColor = 0x00ff00;
+    const clickedColor = 0xffff00;
+    let obj: any;
+    let isHover = false;
+    let isClicked = false;
+
+    let tmpCoord: any;
+
+    const mousedownEvent = (e: MouseEvent) => {
+      const coords = calPointerCoord(e);
+      const intersections = rayCrossing(coords, camera, scene, "joint");
+      if (!isClicked) {
+        obj = colourMesh(intersections, clickedColor, "joint");
+        isClicked = true;
+        tmpCoord = coords;
+      } else {
+        colourMesh(intersections, defaultColor, "joint");
+        isClicked = false;
+      }
+    };
 
     const moveEvent = (e: MouseEvent) => {
       const coords = calPointerCoord(e);
       const intersections = rayCrossing(coords, camera, scene, "joint");
-      if (intersections.length === 0) {
+      const hasIntersaction = intersections.length === 0;
+
+      if (hasIntersaction && isClicked) {
+        console.log(e.movementY);
+        return;
+      }
+
+      if (hasIntersaction && !isClicked) {
         if (obj?.object) {
-          obj.object!.material.color.set(0xff0000);
+          obj.object!.material.color.set(defaultColor);
+          isHover = false;
         }
       }
 
-      obj = colourMesh(intersections, 0x00ff00, "joint");
+      if (!isClicked) {
+        obj = colourMesh(intersections, hoverColor, "joint");
+        isHover = true;
+      }
       renderer!.render(scene!, camera!);
     };
 
     canvas.addEventListener("mousemove", moveEvent);
+    canvas.addEventListener("mousedown", mousedownEvent);
     return () => {
       canvas.removeEventListener("mousemove", moveEvent);
+      canvas.removeEventListener("mousedown", mousedownEvent);
     };
   }, [isReady, canvas, renderer, camera, scene]);
 };
