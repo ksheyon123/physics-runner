@@ -38,8 +38,9 @@ export const NAV_PHYSICS_ITEMS = [
 
 export const NAV_TEST_ITEMS = [
   { label: "Collision", key: 1, link: `${TUTORIAL}/collision-check` },
-  // { label: "Quaternion", key: 2, link: `${TUTORIAL}/quaternion` },
-  { label: "Pin on the Mesh", key: 2, link: `${TUTORIAL}/pin-on-mesh` },
+  { label: "Quaternion", key: 2, link: `${TUTORIAL}/quaternion` },
+  { label: "Pin on the Mesh", key: 3, link: `${TUTORIAL}/pin-on-mesh` },
+  { label: "Mesh on the Sphere", key: 4, link: `${TUTORIAL}/mesh-on-sphere` },
 ];
 
 export const MESH_TEST_ITEMS = [

@@ -25,7 +25,10 @@ export const makeMesh = (
   color?: number
 ) => {
   const geometry = new THREE.BoxGeometry(width || 5, height || 5, depth || 5);
-  const material = new THREE.MeshBasicMaterial({ color: color || 0x000000 });
+  const material = new THREE.MeshBasicMaterial({
+    color: color || 0x000000,
+    wireframe: true,
+  });
   const cube = new THREE.Mesh(geometry, material);
   return cube;
 };
