@@ -57,9 +57,17 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      const mesh = makeMesh();
-      mesh.rotateZ(Math.PI / 3);
-      scene.add(mesh);
+      const mesh0 = makeMesh();
+      mesh0.rotateZ(Math.PI / 3);
+      scene.add(mesh0);
+
+      const mesh1 = makeMesh();
+      mesh1.position.set(9, 1, 0);
+      scene.add(mesh1);
+
+      const mesh2 = makeMesh();
+      mesh2.position.set(12, 0, 8);
+      scene.add(mesh2);
 
       let id: any;
       const animate = () => {

@@ -11,6 +11,8 @@ export const usePin = (
   const pinMeshesRef = useRef<THREE.Mesh>();
 
   const add = (coord: THREE.Vector3) => {
+    // Clean up previous cone
+    remove();
     const cone = makeCone();
     cone.position.set(coord.x, coord.y, coord.z);
     cone.rotateZ(Math.PI);
