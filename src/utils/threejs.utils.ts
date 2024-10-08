@@ -1,6 +1,13 @@
 import * as THREE from "three";
 import { combineTypedArray } from "./utils";
 
+export const makeCone = () => {
+  const geometry = new THREE.ConeGeometry(0.2, 1, 32);
+  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  const cone = new THREE.Mesh(geometry, material);
+  return cone;
+};
+
 export const makePlane = (w: number, h: number, color?: number) => {
   const geometry = new THREE.PlaneGeometry(w, h);
   const material = new THREE.MeshBasicMaterial({

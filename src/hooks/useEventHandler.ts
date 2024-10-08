@@ -19,16 +19,29 @@ export const useEventHandler = (
 
   useEffect(() => {
     if (!canvas || !isReady || !renderer || !camera || !scene) return;
-    console.log("Event Attached");
-
     const defaultColor = 0xff0000;
     const hoverColor = 0x00ff00;
     const clickedColor = 0xffff00;
     let obj: any;
-    let isHover = false;
     let isClicked = false;
-
     let tmpCoord: any;
+    let altAcitve = false;
+
+    const keydownEvent = (e: KeyboardEvent) => {
+      const code = e.code as "MetaLeft";
+      if (code === "MetaLeft") {
+        console.log("KEY DOWN :", code);
+        altAcitve = true;
+      }
+    };
+
+    const keyupEvent = (e: KeyboardEvent) => {
+      const code = e.code as "MetaLeft";
+      if (code === "MetaLeft") {
+        console.log("KEY UP : ", code);
+        altAcitve = false;
+      }
+    };
 
     const mousedownEvent = (e: MouseEvent) => {
       const coords = calPointerCoord(e);
@@ -48,7 +61,7 @@ export const useEventHandler = (
       const intersections = rayCrossing(coords, camera, scene, "joint");
       const hasIntersaction = intersections.length === 0;
 
-      if (hasIntersaction && isClicked) {
+      if (altAcitve && hasIntersaction && isClicked) {
         const [b] = scene.children.filter((e) => e.name === "cylinder");
         if (e.movementY > 0) {
           b.rotateZ(-0.004);
@@ -67,20 +80,22 @@ export const useEventHandler = (
       if (hasIntersaction && !isClicked) {
         if (obj?.object) {
           obj.object!.material.color.set(defaultColor);
-          isHover = false;
         }
       }
 
       if (!isClicked) {
         obj = colourMesh(intersections, hoverColor, "joint");
-        isHover = true;
       }
       renderer!.render(scene!, camera!);
     };
 
+    window.addEventListener("keydown", keydownEvent);
+    window.addEventListener("keyup", keyupEvent);
     canvas.addEventListener("mousemove", moveEvent);
     canvas.addEventListener("mousedown", mousedownEvent);
     return () => {
+      window.removeEventListener("keydown", keydownEvent);
+      window.removeEventListener("keyup", keyupEvent);
       canvas.removeEventListener("mousemove", moveEvent);
       canvas.removeEventListener("mousedown", mousedownEvent);
     };
