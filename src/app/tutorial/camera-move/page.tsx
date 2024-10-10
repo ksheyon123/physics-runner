@@ -9,6 +9,7 @@ import { useCamera } from "@/hooks/useCamera";
 import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
+import { makeSphere } from "@/utils/threejs.utils";
 
 const Page = () => {
   const gap = 80;
@@ -18,11 +19,14 @@ const Page = () => {
   const {} = useMesh();
 
   const canvasRef = useRef<HTMLDivElement>(null);
-  const { createCamera } = useCamera(canvasRef.current);
 
   const sceneRef = useRef<any>(null);
-  const cameraRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
+  const {
+    updateLookAt,
+    camera,
+    isLoaded: cameraLoaded,
+  } = useCamera(canvasRef.current, rendererRef.current, sceneRef.current);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -30,25 +34,27 @@ const Page = () => {
 
   useEffect(() => {
     sceneRef.current = createScene();
-    cameraRef.current = createCamera();
-    cameraRef.current.position.set(0, 0, 10);
+    // cameraRef.current = createCamera();
+    // cameraRef.current.position.set(0, 0, 10);
     rendererRef.current = createRenderer(canvasWidth, canvasHeight);
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (isMounted) {
+    if (isMounted && cameraLoaded) {
       console.log("IS LOADED");
-      const camera = cameraRef.current;
+      // const camera = cameraRef.current;
       const renderer = rendererRef.current;
       const scene = sceneRef.current;
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
-      const controls = new OrbitControls(camera, renderer.domElement);
+      // const controls = new OrbitControls(camera, renderer.domElement);
+
+      const sphere = makeSphere();
+      scene.add(sphere);
 
       let id: any;
       const animate = () => {
-        controls.update();
-
+        updateLookAt(sphere);
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
       };
@@ -59,7 +65,7 @@ const Page = () => {
         cancelAnimationFrame(id);
       };
     }
-  }, [isMounted]);
+  }, [isMounted, cameraLoaded]);
 
   return (
     <ForwardedCanvas
