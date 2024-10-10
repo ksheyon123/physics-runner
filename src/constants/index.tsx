@@ -41,6 +41,7 @@ export const NAV_TEST_ITEMS = [
   { label: "Quaternion", key: 2, link: `${TUTORIAL}/quaternion` },
   { label: "Pin on the Mesh", key: 3, link: `${TUTORIAL}/pin-on-mesh` },
   { label: "Mesh on the Sphere", key: 4, link: `${TUTORIAL}/mesh-on-sphere` },
+  { label: "Camera Control ", key: 5, link: `${TUTORIAL}/camera-move` },
 ];
 
 export const MESH_TEST_ITEMS = [

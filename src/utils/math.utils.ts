@@ -11,9 +11,10 @@ export const polarToCartesian = (
   phi: number = 0
 ) => {
   // 구 좌표를 데카르트 좌표로 변환
+  // XZ Plane에 Y 축
   let x = radius * Math.cos(phi) * Math.cos(theta);
-  let y = radius * Math.sin(phi) * Math.cos(theta);
-  let z = radius * Math.sin(theta);
+  let y = radius * Math.sin(phi);
+  let z = radius * Math.cos(phi) * Math.sin(theta);
   return { x, y, z };
 };
 export const cartesianToPolar = () => {};
