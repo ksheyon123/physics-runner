@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
-export const useCamera = () => {
+export const useCamera = (canvas: HTMLDivElement | null) => {
   const cameraRef = useRef<THREE.PerspectiveCamera>();
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -20,13 +20,15 @@ export const useCamera = () => {
   };
 
   useEffect(() => {
-    const camera = createCamera();
-    cameraRef.current = camera;
-    setIsLoaded(true);
-  }, []);
+    if (canvas) {
+      const camera = createCamera();
+      cameraRef.current = camera;
+      setIsLoaded(true);
+    }
+  }, [canvas]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (canvas && isLoaded) {
       let keys: { [key: string]: boolean } = {};
       const keyevent = (e: KeyboardEvent) => {
         const code = e.code;
@@ -36,15 +38,19 @@ export const useCamera = () => {
         };
       };
 
-      const ev = () => {};
+      const ev = (e: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+      };
 
       window.addEventListener("keydown", keyevent);
       window.addEventListener("keyup", keyevent);
-      window.addEventListener("mousemove", ev);
+      canvas.addEventListener("mousemove", ev);
       return () => {
         window.removeEventListener("keydown", keyevent);
         window.removeEventListener("keyup", keyevent);
-        window.removeEventListener("mousemove", ev);
+        canvas.removeEventListener("mousemove", ev);
       };
     }
   }, [isLoaded]);

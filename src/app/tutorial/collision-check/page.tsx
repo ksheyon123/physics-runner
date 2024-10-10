@@ -13,7 +13,7 @@ import Cube from "@/types/Model";
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene>();
-  const { createCamera } = useCamera();
+  const { createCamera } = useCamera(canvasRef.current);
   const { createRenderer, createScene } = useRenederer();
   const {
     createMesh,

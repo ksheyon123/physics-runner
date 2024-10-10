@@ -11,11 +11,11 @@ import styled from "styled-components";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
 
 const Page = () => {
-  const { createCamera } = useCamera();
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const { createCamera } = useCamera(canvasRef.current);
   const { createRenderer, createScene } = useRenederer();
   const {} = useMesh();
-
-  const canvasRef = useRef<HTMLDivElement>(null);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 

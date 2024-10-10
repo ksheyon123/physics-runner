@@ -316,4 +316,39 @@ export const getHemiSpherePoint = (
   return { x, y, z };
 };
 
+export const calPointerCoord = (
+  event: any,
+  width: number,
+  height: number,
+  gap: number
+) => {
+  const x = (event.clientX / width) * 2 - 1;
+  const y = -((event.clientY - gap) / height) * 2 + 1;
+  return {
+    x,
+    y,
+  };
+};
+
+export const rayCrossing = (
+  coord: any,
+  camera: THREE.PerspectiveCamera,
+  scene: THREE.Scene,
+  filter?: string
+) => {
+  // calculate pointer position in normalized device coordinates
+  // (-1 to +1) for both components
+  const pointer = new THREE.Vector2(coord.x, coord.y);
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(pointer, camera);
+  let objs = scene.children;
+  if (filter) {
+    objs = scene.children.filter((el) => el.name === filter);
+  }
+
+  // calculate objects intersecting the picking ray
+  const intersects = raycaster.intersectObjects(objs);
+  return intersects;
+};
+
 export const getQuaternion = () => {};

@@ -10,10 +10,11 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const Page = () => {
-  const { createCamera } = useCamera();
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const { createCamera } = useCamera(canvasRef.current);
   const { createRenderer, createScene } = useRenederer();
 
-  const canvasRef = useRef<HTMLDivElement>();
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {

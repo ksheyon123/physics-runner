@@ -17,14 +17,15 @@ const Page = () => {
   const gap = 80;
   const canvasWidth = window.innerWidth;
   const canvasHeight = window.innerHeight - gap;
-  const { createCamera } = useCamera();
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const { createCamera } = useCamera(canvasRef.current);
   const { createRenderer, createScene } = useRenederer();
   const { calPointerCoord, rayCrossing } = useRaycaster(
     window.innerWidth,
     window.innerHeight,
     gap
   );
-  const canvasRef = useRef<HTMLDivElement>(null);
 
   const sceneRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);

@@ -12,7 +12,9 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const Page = () => {
-  const { createCamera } = useCamera();
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const { createCamera } = useCamera(canvasRef.current);
   const { createRenderer, createScene } = useRenederer();
   const {
     createMesh,
@@ -23,7 +25,6 @@ const Page = () => {
     collisionCheck,
   } = useMesh();
 
-  const canvasRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
