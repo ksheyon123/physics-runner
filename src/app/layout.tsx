@@ -17,6 +17,11 @@ export default function RootLayout({
           async
           src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-chtml.js"
         ></script>
+
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        ></meta>
       </head>
       <body>
         <Providers>

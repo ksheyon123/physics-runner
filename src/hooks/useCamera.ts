@@ -36,12 +36,11 @@ export const useCamera = (
     }
   };
 
-  const updatePosition = () => {};
-
   useEffect(() => {
     if (canvas) {
       const camera = createCamera();
       cameraRef.current = camera;
+      camera.position.set(0, 0, 10);
       setIsLoaded(true);
     }
   }, [canvas]);
@@ -100,13 +99,22 @@ export const useCamera = (
         prevMouseY = y;
       };
 
+      const zoom = (e: WheelEvent) => {
+        const delta = e.deltaY;
+        if (keys.MetaLeft) {
+          console.log(delta);
+        }
+      };
+
       window.addEventListener("keydown", keyevent);
       window.addEventListener("keyup", keyevent);
       canvas.addEventListener("mousemove", ev);
+      canvas.addEventListener("wheel", zoom);
       return () => {
         window.removeEventListener("keydown", keyevent);
         window.removeEventListener("keyup", keyevent);
         canvas.removeEventListener("mousemove", ev);
+        canvas.removeEventListener("wheel", zoom);
       };
     }
   }, [isLoaded]);
