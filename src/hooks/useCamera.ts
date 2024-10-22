@@ -91,12 +91,6 @@ export const useCamera = (
             z: cz,
           } = polarToCartesian(distanceTo, theta, phi);
 
-          console.log(camera!.rotation.z);
-          if (camera!.rotation.z <= -3.1) {
-            console.log("Prevent Flip");
-            camera?.up.set(0, -1, 0);
-          }
-
           camera!.position.set(cx, cy, cz);
           renderer.render(scene, camera!);
         }
