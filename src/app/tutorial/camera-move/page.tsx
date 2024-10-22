@@ -59,27 +59,46 @@ const Page = () => {
       let phi = 0;
       let id: any;
       let initCoord = { x: 0, y: 0, z: 0 };
+
+      const cameraDistanceFromBox = 3; // Camera is 3 units away from the box
+      const angleFromTangent = THREE.MathUtils.degToRad(30);
+
       const animate = () => {
+        id = requestAnimationFrame(animate);
+
         // Get the box coordinate on the sphere
         const { x, y, z } = polarToCartesian(5 + 0.5, 0, phi);
         box.position.set(x, y, z);
 
         // Get the camera coordinate on the box
         if (camera) {
-          const { x: cx, y: cy, z: cz } = polarToCartesian(8, 0, phi);
-          camera.position.set(cx, cy, cz);
-          updateLookAt(box);
+          // Calculate the tangent direction at the box's position (normalized)
+          const tangent = new THREE.Vector3(
+            -Math.sin(phi),
+            Math.cos(phi),
+            0
+          ).normalize();
 
-          const up = new THREE.Vector3(0, 1, 0);
-          // Box의 기본 "위쪽" 방향 (0, 1, 0)과 법선 벡터 (x, y, z)를 맞추는 Quaternion 계산
-          const normal = new THREE.Vector3(cx, cy, cz).normalize(); // 구의 표면에 수직인 법선 벡터
+          // Calculate the direction vector for the camera 30 degrees above the tangent
+          const up = new THREE.Vector3(0, 1, 0); // "Up" direction (along Y-axis)
+          const cameraDirection = new THREE.Vector3();
 
-          const quaternion = new THREE.Quaternion();
-          quaternion.setFromUnitVectors(up, normal);
-          camera.quaternion.copy(quaternion);
+          // Rotate tangent vector 30 degrees above along the up direction
+          cameraDirection.crossVectors(tangent, up).normalize(); // Perpendicular vector to tangent and up
+          cameraDirection.applyAxisAngle(tangent, angleFromTangent); // Apply 30 degree rotation around tangent
 
-          // Update the camera's matrix after setting the quaternion
-          camera.updateMatrixWorld();
+          // Place the camera at a distance from the box along the calculated direction
+          const cameraPosition = new THREE.Vector3()
+            .copy(box.position)
+            .addScaledVector(cameraDirection, cameraDistanceFromBox);
+          camera.position.set(
+            cameraPosition.x,
+            cameraPosition.y,
+            cameraPosition.z
+          );
+
+          // Make the camera look at the box
+          camera.lookAt(box.position);
         }
 
         const up = new THREE.Vector3(0, 1, 0);
@@ -90,7 +109,6 @@ const Page = () => {
         quaternion.setFromUnitVectors(up, normal);
         box.quaternion.copy(quaternion);
 
-        id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
         phi += 0.01;
       };
