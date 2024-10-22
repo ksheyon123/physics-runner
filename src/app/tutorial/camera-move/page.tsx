@@ -58,15 +58,32 @@ const Page = () => {
 
       let phi = 0;
       let id: any;
+      let initCoord = { x: 0, y: 0, z: 0 };
       const animate = () => {
-        updateLookAt(sphere);
-
+        // Get the box coordinate on the sphere
         const { x, y, z } = polarToCartesian(5 + 0.5, 0, phi);
-
         box.position.set(x, y, z);
 
+        // Get the camera coordinate on the box
+        if (camera) {
+          const { x: cx, y: cy, z: cz } = polarToCartesian(8, 0, phi);
+          camera.position.set(cx, cy, cz);
+          updateLookAt(box);
+
+          const up = new THREE.Vector3(0, 1, 0);
+          // Box의 기본 "위쪽" 방향 (0, 1, 0)과 법선 벡터 (x, y, z)를 맞추는 Quaternion 계산
+          const normal = new THREE.Vector3(cx, cy, cz).normalize(); // 구의 표면에 수직인 법선 벡터
+
+          const quaternion = new THREE.Quaternion();
+          quaternion.setFromUnitVectors(up, normal);
+          camera.quaternion.copy(quaternion);
+
+          // Update the camera's matrix after setting the quaternion
+          camera.updateMatrixWorld();
+        }
+
+        const up = new THREE.Vector3(0, 1, 0);
         // Box의 기본 "위쪽" 방향 (0, 1, 0)과 법선 벡터 (x, y, z)를 맞추는 Quaternion 계산
-        const up = new THREE.Vector3(0, 1, 0); // Box의 기본 '위쪽' 방향
         const normal = new THREE.Vector3(x, y, z).normalize(); // 구의 표면에 수직인 법선 벡터
 
         const quaternion = new THREE.Quaternion();
