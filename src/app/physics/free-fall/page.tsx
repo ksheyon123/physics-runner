@@ -48,41 +48,56 @@ const Page = () => {
 
       const prevVel = new THREE.Vector3();
 
-      // const textMesh = createText(prevVel.y.toString());
-      // textMesh.position.set(2, 0, 0);
+      const textMesh = createText(prevVel.y.toString(), 0.4);
+      textMesh.position.set(2, 0, 0);
+      scene.add(textMesh);
 
-      // scene.add(textMesh);
+      const depsText = createText((0).toString(), 1);
+      depsText.position.set(2, 0, 4);
+      scene.add(depsText)
 
       let handleId: any;
       let readyToSet = true;
       let idx = 0;
-      let backBoardIds : THREE.Mesh[] = [];
+      // let previousIdx = -1;  // Track previous idx value
+      let backBoards : THREE.Mesh[] = [];
+
       const animate = () => {
         const prevPosition = mesh.position.clone();
         const curIdx = Math.floor(Math.abs(prevPosition.clone().y) % 10);
         if(curIdx === 0 && readyToSet) {
-          if(backBoardIds.length > 3) {
-            const b = backBoardIds.shift();
+          if(backBoards.length > 3) {
+            const b = backBoards.shift();
             b?.removeFromParent();
           }
-          const backBoard = makePlane(5, 20, 0x00ffff, false);
-          const {x, y, z} = new THREE.Vector3(0, -(idx * 20) - 10, -2)
-          backBoard.position.set(x, y, z)
-          backBoard.name = "back_board"
-          scene.add(backBoard)
 
-          const heightText = createText((-idx * 20).toString());
-          heightText.position.set(2, -idx * 20, 0);
-          scene.add(heightText)
+          if(idx === 0) {
+            const backBoard = makePlane(5, 20, 0x00ffff, false);
+            const {x, y, z} = new THREE.Vector3(0, -10, -2)
+            backBoard.position.set(x, y, z)
+            backBoard.name = "back_board"
+            scene.add(backBoard)
+            backBoards.push(backBoard);
+          }
 
-          backBoardIds.push(backBoard)
+          if(idx % 2 === 1) {
+            const backBoard = makePlane(5, 20, 0x00ffff, false);
+            const {x, y, z} = new THREE.Vector3(0, -(idx * 10) - 20, -2)
+            backBoard.position.set(x, y, z)
+            backBoard.name = "back_board"
+            scene.add(backBoard)
+            backBoards.push(backBoard);
 
+            updateText(depsText, (-(idx * 10 + 10)).toString());
+            depsText.position.set(2, -(idx * 10 + 10), 4);
+          }
           readyToSet = false;
           idx += 1;
         } else if (curIdx !== 0 && !readyToSet) {
           readyToSet = true;
 
         }
+      
         const force = calForce(new THREE.Vector3());
         const acc = calAcceleration(force);
         const newVel = calVelocity(prevVel, acc);
@@ -92,12 +107,11 @@ const Page = () => {
         prevVel.set(newVel.x, newVel.y, newVel.z);
         
         // Update text for Velocity
-        // updateText(textMesh, newVel.y.toString());
-        // textMesh.position.set(2, newP.y, newP.z);
+        updateText(textMesh, newVel.y.toString());
+        textMesh.position.set(2, newP.y, newP.z);
 
         camera.position.set(0, newP.y, 10);
         camera.lookAt(newP.x, newP.y, newP.z);
-        // divEl.innerHTML = "Vel y : " + newVel.y;
         handleId = requestAnimationFrame(animate);
         renderer.render(scene, camera);
       };

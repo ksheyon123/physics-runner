@@ -19,10 +19,10 @@ export const useText = () => {
     getFont();
   }, []);
 
-  const createText = (text: string) => {
+  const createText = (text: string, size = 0.2) => {
     const textGeometry = new TextGeometry(text, {
       font: font,
-      size: 0.2,
+      size,
       depth: 0.05,
       curveSegments: 12,
       bevelEnabled: true,
@@ -38,20 +38,16 @@ export const useText = () => {
   };
 
   const updateText = (textMesh: THREE.Mesh, newText: string) => {
+    const spec = {
+      ...(textMesh.geometry as any).parameters.options,
+    }
     // Remove the old geometry
     textMesh.geometry.dispose(); // Dispose of the old geometry to avoid memory leaks
 
     // Create a new geometry with the updated text
     const newGeometry = new TextGeometry(newText, {
+      ...spec,
       font: font,
-      size: 0.2,
-      depth: 0.05,
-      curveSegments: 2,
-      bevelEnabled: true,
-      bevelThickness: 0.001,
-      bevelSize: 0.005,
-      bevelOffset: 0,
-      bevelSegments: 10,
     });
 
     // Assign the new geometry to the textMesh
