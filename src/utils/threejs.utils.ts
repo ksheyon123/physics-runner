@@ -8,11 +8,11 @@ export const makeCone = () => {
   return cone;
 };
 
-export const makePlane = (w: number, h: number, color?: number) => {
+export const makePlane = (w: number, h: number, color?: number, wire = true) => {
   const geometry = new THREE.PlaneGeometry(w, h);
   const material = new THREE.MeshBasicMaterial({
     color: color || 0xffff00,
-    wireframe: true,
+    wireframe: wire,
   });
   const plane = new THREE.Mesh(geometry, material);
   return plane;
@@ -22,12 +22,13 @@ export const makeMesh = (
   width?: number,
   height?: number,
   depth?: number,
-  color?: number
+  color?: number,
+  wire = true
 ) => {
   const geometry = new THREE.BoxGeometry(width || 5, height || 5, depth || 5);
   const material = new THREE.MeshBasicMaterial({
     color: color || 0x000000,
-    wireframe: true,
+    wireframe: wire,
   });
   const cube = new THREE.Mesh(geometry, material);
   return cube;

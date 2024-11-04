@@ -23,7 +23,7 @@ export const useText = () => {
     const textGeometry = new TextGeometry(text, {
       font: font,
       size: 0.2,
-      height: 0.05,
+      depth: 0.05,
       curveSegments: 12,
       bevelEnabled: true,
       bevelThickness: 0.01,

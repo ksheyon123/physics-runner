@@ -2,8 +2,8 @@ import { makeMesh } from "@/utils/threejs.utils";
 import { useRef } from "react";
 import * as THREE from "three";
 
-export const useMesh = () => {
-  const dt = 1 / 60; // [s] (10 times faster)
+export const useMesh = (hz = 1 /60) => {
+  const dt = hz; // [s] (10 times faster)
   const g = -9.805; // [m/s**2]
   const mass = 1; // [kg]
 
@@ -171,7 +171,6 @@ export const useMesh = () => {
   // v ** 2 - v0 ** 2 = 2gh
   const kinetic = (vel: THREE.Vector3) => {
     const h = Math.pow(vel.y, 2) / (2 * g);
-    console.log(h);
     // const newVy = Math.sqrt(Math.abs(2 * h * 9.81));
     const newVy = Math.sqrt(2 * g * h);
     return new THREE.Vector3(0, newVy, 0);
