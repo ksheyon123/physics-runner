@@ -17,11 +17,13 @@ import {
 } from "@/utils/threejs.utils";
 
 const Page = () => {
-  const { createCamera } = useCamera();
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<any>(null);
+  const cameraRef = useRef<any>(null);
+  const rendererRef = useRef<any>(null);
+  const { createCamera } = useCamera(canvasRef.current, rendererRef.current, sceneRef.current);
   const { createRenderer, createScene } = useRenederer();
   // const { createMesh } = useMesh();
-
-  const canvasRef = useRef<HTMLDivElement>(null);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 

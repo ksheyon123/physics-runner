@@ -1,8 +1,4 @@
 import { polarToCartesian } from "@/utils/math.utils";
-import {
-  calPointerCoord,
-  getCirclePolarCoordinate,
-} from "@/utils/threejs.utils";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 

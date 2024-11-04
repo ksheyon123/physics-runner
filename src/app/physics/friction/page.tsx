@@ -24,8 +24,10 @@ const Page = () => {
   const canvasWidth = window.innerWidth;
   const canvasHeight = window.innerHeight - gap;
   const canvasRef = useRef<HTMLDivElement>(null);
-
-  const { createCamera } = useCamera(canvasRef.current);
+  const sceneRef = useRef<any>(null);
+  const cameraRef = useRef<any>(null);
+  const rendererRef = useRef<any>(null);
+  const { createCamera } = useCamera(canvasRef.current, rendererRef.current, sceneRef.current);
   const { createRenderer, createScene } = useRenederer();
   const {} = useMesh();
   const { isLoaded, createText } = useText();
@@ -34,10 +36,6 @@ const Page = () => {
     canvasHeight,
     gap
   );
-
-  const sceneRef = useRef<any>(null);
-  const cameraRef = useRef<any>(null);
-  const rendererRef = useRef<any>(null);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 

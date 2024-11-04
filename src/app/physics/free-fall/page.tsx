@@ -16,9 +16,11 @@ import { useText } from "@/hooks/useText";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<THREE.Scene>();
+  const sceneRef = useRef<any>(null);
   const { isLoaded, createText, updateText } = useText();
-  const { createCamera } = useCamera(canvasRef.current);
+  const cameraRef = useRef<any>(null);
+  const rendererRef = useRef<any>(null);
+  const { createCamera } = useCamera(canvasRef.current, rendererRef.current, sceneRef.current);
   const { createRenderer, createScene } = useRenederer();
   const {
     createMesh,
