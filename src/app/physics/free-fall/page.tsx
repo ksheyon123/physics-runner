@@ -98,6 +98,7 @@ const Page = () => {
 
         }
       
+        // Euler 방법을 통한 근사 (룽게-쿠타 방법도 있음)
         const dForce = dragForce(1.1, 1.204, 1, prevVel.y);
         const downForce = calForce(dForce);
         const acc = calAcceleration(downForce);
