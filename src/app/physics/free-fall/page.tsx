@@ -24,7 +24,7 @@ const Page = () => {
   const { createCamera } = useCamera(canvasRef.current, rendererRef.current, sceneRef.current);
   const { createRenderer, createScene } = useRenederer();
   const {
-    createMesh,
+    dragForce,
     calForce,
     calAcceleration,
     calVelocity,
@@ -42,7 +42,7 @@ const Page = () => {
 
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
 
-      const mesh = makeMesh(0.5, 0.5, 0.5, 0x000000, false);
+      const mesh = makeMesh(0.5, 0.5, 0.5, 0xffffff, false);
       mesh.position.set(0, 0, 0);
       scene.add(mesh);
 
@@ -72,7 +72,7 @@ const Page = () => {
           }
 
           if(idx === 0) {
-            const backBoard = makePlane(5, 20, 0x00ffff, false);
+            const backBoard = makePlane(5, 20, 0xffffff, false);
             const {x, y, z} = new THREE.Vector3(0, -10, -2)
             backBoard.position.set(x, y, z)
             backBoard.name = "back_board"
@@ -81,7 +81,7 @@ const Page = () => {
           }
 
           if(idx % 2 === 1) {
-            const backBoard = makePlane(5, 20, 0x00ffff, false);
+            const backBoard = makePlane(5, 20, 0xffffff, false);
             const {x, y, z} = new THREE.Vector3(0, -(idx * 10) - 20, -2)
             backBoard.position.set(x, y, z)
             backBoard.name = "back_board"
@@ -98,8 +98,9 @@ const Page = () => {
 
         }
       
-        const force = calForce(new THREE.Vector3());
-        const acc = calAcceleration(force);
+        const dForce = dragForce(1.1, 1.204, 1, prevVel.y);
+        const downForce = calForce(dForce);
+        const acc = calAcceleration(downForce);
         const newVel = calVelocity(prevVel, acc);
         const newP = calCoordinate(prevPosition, prevVel, newVel);
 
