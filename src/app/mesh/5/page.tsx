@@ -65,18 +65,18 @@ const Page = () => {
 
       // Create bones and attach them in a hierarchy
       const rootBone = new THREE.Bone();
-      rootBone.position.y = -5;
+      rootBone.position.y = 5;
       const rootVisual = createBoneVisual(0xff0000); // 빨간색
       rootBone.add(rootVisual);
 
       const midBone = new THREE.Bone();
-      midBone.position.y = 5; // rootBone으로부터 5만큼 위로
+      midBone.position.y = -5; // rootBone으로부터 5만큼 위로
       rootBone.add(midBone);
       const midVisual = createBoneVisual(0x00ff00); // 초록색
       midBone.add(midVisual);
 
       const endBone = new THREE.Bone();
-      endBone.position.y = 5; // midBone으로부터 5만큼 위로
+      endBone.position.y = -5; // midBone으로부터 5만큼 위로
       midBone.add(endBone);
       const endVisual = createBoneVisual(0x0000ff); // 파란색
       endBone.add(endVisual);
@@ -86,10 +86,12 @@ const Page = () => {
       scene.add(skeletonHelper);
 
       // Create skeleton with bones
-      const skeleton = new THREE.Skeleton([endBone, midBone, rootBone]);
+      const skeleton = new THREE.Skeleton([rootBone, midBone, endBone]);
 
-      // Geometry and material for the skinned mesh
+      // Geometry를 bone 구조에 맞게 생성 (높이 10으로 수정)
       const geometry = new THREE.CylinderGeometry(0.5, 0.5, 10, 32);
+      // geometry.translate(0, , 0); // cylinder를 bone 위치에 맞게 조정
+
       const material = new THREE.MeshBasicMaterial({
         color: 0x00ff00,
         wireframe: true,
@@ -110,19 +112,17 @@ const Page = () => {
 
       for (let i = 0; i < position.count; i++) {
         vertex.fromBufferAttribute(position, i);
-
-        // y값을 -5에서 5 사이로 정규화
-        const y = vertex.y;
+        const y = vertex.y; // -5에서 5 사이의 값
 
         if (y < 0) {
-          // 하단부: rootBone(0)과 midBone(1)의 영향
+          // 하단부 (0 ~ -5): midBone과 endBone의 영향
           const influence = (y + 5) / 5; // -5~0 범위를 0~1로 변환
-          skinIndices.push(0, 1, 0, 0);
+          skinIndices.push(1, 2, 0, 0);
           skinWeights.push(1 - influence, influence, 0, 0);
         } else {
-          // 상단부: midBone(1)과 endBone(2)의 영향
+          // 상단부 (0 ~ 5): rootBone과 midBone의 영향
           const influence = y / 5; // 0~5 범위를 0~1로 변환
-          skinIndices.push(1, 2, 0, 0);
+          skinIndices.push(0, 1, 0, 0);
           skinWeights.push(1 - influence, influence, 0, 0);
         }
       }
@@ -153,14 +153,12 @@ const Page = () => {
 
         const time = Date.now() * 0.001;
 
-        // rootBone은 고정
-        rootBone.position.y = -5 + Math.sin(time);
+        rootBone.rotation.z = Math.abs(Math.sin(time));
+        midBone.position.x = Math.sin(time) / 2;
+        midBone.position.y = -5 + (2 * Math.sin(time)) / 2;
 
-        // midBone을 중심으로 구부러지는 움직임
-        midBone.rotation.z = Math.sin(time) * 0.5;
-
-        // endBone은 midBone의 움직임을 따라가되 약간의 지연효과
-        // endBone.rotation.z = Math.sin(time - 0.2) * 0.3;
+        endBone.position.x = -5 * Math.abs(Math.sin(time));
+        endBone.position.y = -5 + 2 * Math.abs(Math.sin(time));
 
         renderer.render(scene, camera);
       };
