@@ -19,7 +19,11 @@ const Page = () => {
   const sceneRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
-  const { createCamera } = useCamera(canvasRef.current, rendererRef.current, sceneRef.current);
+  const { createCamera } = useCamera(
+    canvasRef.current,
+    rendererRef.current,
+    sceneRef.current
+  );
   const { createRenderer, createScene } = useRenederer();
   const {} = useMesh();
 
@@ -32,7 +36,11 @@ const Page = () => {
     cameraRef.current = createCamera();
     cameraRef.current.position.set(0, 0, 10);
     const renderer = createRenderer(canvasWidth, canvasHeight);
-    rendererRef.current = renderer
+    rendererRef.current = renderer;
+
+    const axesHelper = new THREE.AxesHelper(5);
+    sceneRef.current.add(axesHelper);
+
     setIsMounted(true);
   }, []);
 
@@ -48,30 +56,53 @@ const Page = () => {
 
       let id: any;
 
+      // bone 시각화를 위한 함수
+      const createBoneVisual = (color: number) => {
+        const geometry = new THREE.SphereGeometry(0.5, 8, 8);
+        const material = new THREE.MeshBasicMaterial({ color: color });
+        return new THREE.Mesh(geometry, material);
+      };
+
       // Create bones and attach them in a hierarchy
       const rootBone = new THREE.Bone();
       rootBone.position.y = -5;
+      // rootBone 시각화
+      const rootVisual = createBoneVisual(0xff0000); // 빨간색
+      rootBone.add(rootVisual);
 
       const midBone = new THREE.Bone();
-      midBone.position.y = 0;
+      midBone.position.y = 5;
       rootBone.add(midBone);
+      // midBone 시각화
+      const midVisual = createBoneVisual(0x00ff00); // 초록색
+      midBone.add(midVisual);
 
       const endBone = new THREE.Bone();
       endBone.position.y = 5;
       midBone.add(endBone);
+      // endBone 시각화
+      const endVisual = createBoneVisual(0x0000ff); // 파란색
+      endBone.add(endVisual);
+
+      // bone 연결선 표시 (흰색)
+      const skeletonHelper = new THREE.SkeletonHelper(rootBone);
+      scene.add(skeletonHelper);
 
       // Create skeleton with bones
       const skeleton = new THREE.Skeleton([rootBone, midBone, endBone]);
 
       // Geometry and material for the skinned mesh
       const geometry = new THREE.CylinderGeometry(1, 1, 10);
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5,
+      });
       const skinnedMesh = new THREE.SkinnedMesh(geometry, material);
 
-      console.log(skinnedMesh.position)
       // Set up bone weights and indices
       const position = geometry.attributes.position;
-      console.log(position)
       const vertex = new THREE.Vector3();
 
       const skinIndices = [];
@@ -81,32 +112,34 @@ const Page = () => {
       // Vertices in the middle (0 ≤ y < 5): We assign these vertices to midBone (index 1) with full influence, following the same pattern as above.
       // Vertices at the top (y ≥ 5): We assign these vertices to endBone (index 2), making endBone fully control them.
       for (let i = 0; i < position.count; i++) {
-          vertex.fromBufferAttribute(position, i);
-          // Determine which bone each vertex belongs to
-          if (vertex.y < 0) {
-              // 1. skinIndices[0]: This refers to the first influencing bone for the vertex.
-              // 2. skinIndices[1]: This would be the second influencing bone (if any).
-              // 3. skinIndices[2]: Third influencing bone.
-              // 4. skinIndices[3]: Fourth influencing bone.
-              skinIndices.push(0, 0, 0, 0);
-              // 1. skinWeights[0]: The weight for the first influencing bone, which is 1 here, meaning rootBone has 100% influence.
-              // 2. skinWeights[1]: The weight for the second bone (if there was one), which is 0, meaning it has no influence.
-              // 3. skinWeights[2]: The weight for the third bone, also 0.
-              // 4. skinWeights[3]: The weight for the fourth bone, also 0.
-              skinWeights.push(1, 0, 0, 0);
-          } else if (vertex.y < 5) {
-              skinIndices.push(1, 1, 0, 0);
-              skinWeights.push(1, 0, 0, 0);
-          } else {
-              skinIndices.push(2, 2, 0, 0);
-              skinWeights.push(1, 0, 0, 0);
-          }
+        vertex.fromBufferAttribute(position, i);
+
+        if (vertex.y < -2) {
+          // 아래쪽: rootBone만 영향
+          skinIndices.push(0, 0, 0, 0);
+          skinWeights.push(1, 0, 0, 0);
+        } else if (vertex.y < 2) {
+          // 중간: rootBone과 midBone의 혼합 영향
+          const influence = (vertex.y + 2) / 4; // -2 ~ 2 범위를 0~1로 변환
+          skinIndices.push(0, 1, 0, 0);
+          skinWeights.push(1 - influence, influence, 0, 0);
+        } else {
+          // 위쪽: midBone과 endBone의 혼합 영향
+          const influence = (vertex.y - 2) / 3; // 2 ~ 5 범위를 0~1로 변환
+          skinIndices.push(1, 2, 0, 0);
+          skinWeights.push(1 - influence, influence, 0, 0);
+        }
       }
-      console.log(vertex)
 
       // Assign skin attributes to the geometry
-      geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
-      geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+      geometry.setAttribute(
+        "skinIndex",
+        new THREE.Uint16BufferAttribute(skinIndices, 4)
+      );
+      geometry.setAttribute(
+        "skinWeight",
+        new THREE.Float32BufferAttribute(skinWeights, 4)
+      );
 
       // Add the root bone to the skinned mesh and bind skeleton
       skinnedMesh.add(rootBone);
@@ -118,12 +151,20 @@ const Page = () => {
 
       const animate = () => {
         controls.update();
-        // Simple rotation for visualization
         id = requestAnimationFrame(animate);
 
-        // Animate bones
-        rootBone.rotation.y += 0.01;
-        midBone.rotation.z +=0.01
+        // 각 bone에 다른 회전 애니메이션 적용
+        const time = Date.now() * 0.001; // 시간 기반 애니메이션
+
+        // rootBone: X축 회전
+        rootBone.rotation.x = Math.sin(time) * 0.5;
+
+        // midBone: Z축 회전
+        midBone.rotation.z = Math.sin(time * 1.5) * 0.5;
+
+        // endBone: Y축 회전
+        endBone.rotation.y = Math.sin(time * 2) * 0.5;
+
         renderer.render(scene, camera);
       };
 

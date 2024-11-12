@@ -50,8 +50,7 @@ export const MESH_TEST_ITEMS = [
   { label: "Half Circle", key: 3, link: `${MESH}/2` },
   { label: "Slope", key: 4, link: `${MESH}/3` },
   { label: "Hollowed Box", key: 5, link: `${MESH}/4` },
-  { label: "Skeleton", key: 5, link: `${MESH}/5` },
-
+  { label: "Bone & Skeleton", key: 6, link: `${MESH}/5` },
 ];
 
 export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {
