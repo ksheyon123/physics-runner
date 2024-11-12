@@ -66,21 +66,18 @@ const Page = () => {
       // Create bones and attach them in a hierarchy
       const rootBone = new THREE.Bone();
       rootBone.position.y = -5;
-      // rootBone 시각화
       const rootVisual = createBoneVisual(0xff0000); // 빨간색
       rootBone.add(rootVisual);
 
       const midBone = new THREE.Bone();
-      midBone.position.y = 5;
+      midBone.position.y = 5; // rootBone으로부터 5만큼 위로
       rootBone.add(midBone);
-      // midBone 시각화
       const midVisual = createBoneVisual(0x00ff00); // 초록색
       midBone.add(midVisual);
 
       const endBone = new THREE.Bone();
-      endBone.position.y = 5;
+      endBone.position.y = 5; // midBone으로부터 5만큼 위로
       midBone.add(endBone);
-      // endBone 시각화
       const endVisual = createBoneVisual(0x0000ff); // 파란색
       endBone.add(endVisual);
 
@@ -89,81 +86,81 @@ const Page = () => {
       scene.add(skeletonHelper);
 
       // Create skeleton with bones
-      const skeleton = new THREE.Skeleton([rootBone, midBone, endBone]);
+      const skeleton = new THREE.Skeleton([endBone, midBone, rootBone]);
 
       // Geometry and material for the skinned mesh
-      const geometry = new THREE.CylinderGeometry(1, 1, 10);
+      const geometry = new THREE.CylinderGeometry(0.5, 0.5, 10, 32);
       const material = new THREE.MeshBasicMaterial({
         color: 0x00ff00,
         wireframe: true,
         transparent: true,
         opacity: 0.5,
       });
-      const skinnedMesh = new THREE.SkinnedMesh(geometry, material);
+
+      // 중요: SkinnedMesh를 생성하기 전에 geometry를 복제
+      const skinnedGeometry = geometry.clone();
+      const skinnedMesh = new THREE.SkinnedMesh(skinnedGeometry, material);
 
       // Set up bone weights and indices
-      const position = geometry.attributes.position;
+      const position = skinnedGeometry.attributes.position;
       const vertex = new THREE.Vector3();
 
       const skinIndices = [];
       const skinWeights = [];
 
-      // Vertices at the bottom (y < 0): We assign these vertices to rootBone (index 0) with full influence. skinIndices.push(0, 0, 0, 0); means only rootBone influences these vertices. skinWeights.push(1, 0, 0, 0); gives rootBone a weight of 1 (full influence).
-      // Vertices in the middle (0 ≤ y < 5): We assign these vertices to midBone (index 1) with full influence, following the same pattern as above.
-      // Vertices at the top (y ≥ 5): We assign these vertices to endBone (index 2), making endBone fully control them.
       for (let i = 0; i < position.count; i++) {
         vertex.fromBufferAttribute(position, i);
 
-        if (vertex.y < -2) {
-          // 아래쪽: rootBone만 영향
-          skinIndices.push(0, 0, 0, 0);
-          skinWeights.push(1, 0, 0, 0);
-        } else if (vertex.y < 2) {
-          // 중간: rootBone과 midBone의 혼합 영향
-          const influence = (vertex.y + 2) / 4; // -2 ~ 2 범위를 0~1로 변환
+        // y값을 -5에서 5 사이로 정규화
+        const y = vertex.y;
+
+        if (y < 0) {
+          // 하단부: rootBone(0)과 midBone(1)의 영향
+          const influence = (y + 5) / 5; // -5~0 범위를 0~1로 변환
           skinIndices.push(0, 1, 0, 0);
           skinWeights.push(1 - influence, influence, 0, 0);
         } else {
-          // 위쪽: midBone과 endBone의 혼합 영향
-          const influence = (vertex.y - 2) / 3; // 2 ~ 5 범위를 0~1로 변환
+          // 상단부: midBone(1)과 endBone(2)의 영향
+          const influence = y / 5; // 0~5 범위를 0~1로 변환
           skinIndices.push(1, 2, 0, 0);
           skinWeights.push(1 - influence, influence, 0, 0);
         }
       }
 
       // Assign skin attributes to the geometry
-      geometry.setAttribute(
+      skinnedGeometry.setAttribute(
         "skinIndex",
         new THREE.Uint16BufferAttribute(skinIndices, 4)
       );
-      geometry.setAttribute(
+      skinnedGeometry.setAttribute(
         "skinWeight",
         new THREE.Float32BufferAttribute(skinWeights, 4)
       );
 
-      // Add the root bone to the skinned mesh and bind skeleton
+      // 중요: 본 계층구조를 먼저 씬에 추가
+      scene.add(rootBone);
+
+      // SkinnedMesh를 씬에 추가
       skinnedMesh.add(rootBone);
       skinnedMesh.bind(skeleton);
-
-      // Position and add to scene
-      skinnedMesh.position.set(0, 0, 0);
       scene.add(skinnedMesh);
+
+      // 스켈레톤 헬퍼는 마지막에 추가
 
       const animate = () => {
         controls.update();
         id = requestAnimationFrame(animate);
 
-        // 각 bone에 다른 회전 애니메이션 적용
-        const time = Date.now() * 0.001; // 시간 기반 애니메이션
+        const time = Date.now() * 0.001;
 
-        // rootBone: X축 회전
-        rootBone.rotation.x = Math.sin(time) * 0.5;
+        // rootBone은 고정
+        rootBone.position.y = -5 + Math.sin(time);
 
-        // midBone: Z축 회전
-        midBone.rotation.z = Math.sin(time * 1.5) * 0.5;
+        // midBone을 중심으로 구부러지는 움직임
+        midBone.rotation.z = Math.sin(time) * 0.5;
 
-        // endBone: Y축 회전
-        endBone.rotation.y = Math.sin(time * 2) * 0.5;
+        // endBone은 midBone의 움직임을 따라가되 약간의 지연효과
+        // endBone.rotation.z = Math.sin(time - 0.2) * 0.3;
 
         renderer.render(scene, camera);
       };
