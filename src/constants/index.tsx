@@ -45,12 +45,8 @@ export const NAV_TEST_ITEMS = [
 ];
 
 export const MESH_TEST_ITEMS = [
-  { label: "Plane", key: 1, link: `${MESH}/0` },
-  { label: "Finger", key: 2, link: `${MESH}/1` },
-  { label: "Half Circle", key: 3, link: `${MESH}/2` },
-  { label: "Slope", key: 4, link: `${MESH}/3` },
-  { label: "Hollowed Box", key: 5, link: `${MESH}/4` },
-  { label: "Bone & Skeleton", key: 6, link: `${MESH}/5` },
+  { label: "Bone & Skeleton", key: 2, link: `${MESH}/1` },
+  { label: "Finger", key: 6, link: `${MESH}/2` },
 ];
 
 export const OPTION_BOX_ITEMS: { [key in SortOfPath]: OptionBoxItem[] } = {

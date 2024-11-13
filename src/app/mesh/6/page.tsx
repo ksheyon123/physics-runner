@@ -9,7 +9,6 @@ import { useCamera } from "@/hooks/useCamera";
 import { useRenederer } from "@/hooks/useRenderer";
 import { useMesh } from "@/hooks/useMesh";
 import { ForwardedCanvas } from "@/components/Canvas/Canvas";
-import { carvedBox } from "@/utils/threejs.utils";
 
 const Page = () => {
   const gap = 80;
@@ -19,10 +18,14 @@ const Page = () => {
   const sceneRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
-  const { createCamera } = useCamera(canvasRef.current, rendererRef.current, sceneRef.current);
+  const { createCamera } = useCamera(
+    canvasRef.current,
+    rendererRef.current,
+    sceneRef.current
+  );
   const { createRenderer, createScene } = useRenederer();
   const {} = useMesh();
-  
+
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   const hz = 1 / 60; //seconds
@@ -43,12 +46,6 @@ const Page = () => {
       const scene = sceneRef.current;
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
-      const firstVertices1 = [1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0];
-      const secondVertices1 = firstVertices1.map((d, idx) =>
-        (idx + 1) % 3 === 0 ? d + 3 : d
-      );
-      const mesh0 = carvedBox(firstVertices1, secondVertices1);
-      scene.add(mesh0);
 
       let id: any;
       const animate = () => {
