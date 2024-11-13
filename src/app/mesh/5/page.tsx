@@ -89,7 +89,14 @@ const Page = () => {
       const skeleton = new THREE.Skeleton([rootBone, midBone, endBone]);
 
       // Geometry를 bone 구조에 맞게 생성 (높이 10으로 수정)
-      const geometry = new THREE.CylinderGeometry(0.5, 0.5, 10, 32);
+      const geometry = new THREE.CylinderGeometry(
+        0.5, // radiusTop
+        0.5, // radiusBottom
+        10, // height
+        32, // radialSegments (around the circumference)
+        20, // heightSegments (along the height)
+        false // openEnded
+      );
       geometry.translate(0, 0, 0); // cylinder를 bone 위치에 맞게 조정
 
       const material = new THREE.MeshBasicMaterial({
@@ -110,25 +117,38 @@ const Page = () => {
       const skinIndices = [];
       const skinWeights = [];
 
+      // Debug: Let's check the actual y values
+      const yValues = new Set();
       for (let i = 0; i < position.count; i++) {
         vertex.fromBufferAttribute(position, i);
-        const y = vertex.y; // -5에서 5 사이의 값
+        yValues.add(vertex.y);
+      }
+      console.log(
+        "Unique Y values:",
+        Array.from(yValues).sort((a: any, b: any) => a - b)
+      );
 
-        if (y < -2.5) {
-          // Bottom third: primarily influenced by endBone
-          const influence = (y + 5) / 2.5; // -5 to -2.5 range to 0-1
-          skinIndices.push(2, 1, 0, 0); // Changed order: endBone(2) has primary influence
+      // Now we can adjust our skinning based on actual vertex positions
+      for (let i = 0; i < position.count; i++) {
+        vertex.fromBufferAttribute(position, i);
+        const y = vertex.y;
+
+        console.log(`Vertex ${i}: y = ${y}`); // Debug each vertex position
+
+        if (y > 0.5) {
+          // Top segment (5 to 0.5): rootBone to midBone
+          const influence = (5 - y) / 5; // Convert 5 to 0.5 range into 0 to 1
+          skinIndices.push(0, 1, 0, 0); // rootBone to midBone
           skinWeights.push(1 - influence, influence, 0, 0);
-        } else if (y < 2.5) {
-          // Middle section: primarily influenced by midBone
-          const influence = (y + 2.5) / 5; // -2.5 to 2.5 range to 0-1
-          skinIndices.push(1, 2, 0, 0);
+        } else if (y < -0.5) {
+          // Bottom segment (-0.5 to -5): midBone to endBone
+          const influence = (-0.5 - y) / 5; // Convert -0.5 to -5 range into 0 to 1
+          skinIndices.push(1, 2, 0, 0); // midBone to endBone
           skinWeights.push(1 - influence, influence, 0, 0);
         } else {
-          // Top third: primarily influenced by rootBone and midBone
-          const influence = (y - 2.5) / 2.5; // 2.5 to 5 range to 0-1
-          skinIndices.push(0, 1, 0, 0);
-          skinWeights.push(1 - influence, influence, 0, 0);
+          // Middle segment (0.5 to -0.5): sharp transition at midBone
+          skinIndices.push(1, 1, 0, 0);
+          skinWeights.push(1, 0, 0, 0);
         }
       }
 
@@ -161,8 +181,6 @@ const Page = () => {
         id = requestAnimationFrame(animate);
 
         rootBone.rotation.z = rad;
-        midBone.position.x = 0;
-        midBone.position.y = -5;
         endBone.position.x = -5 * Math.sin(rad);
         endBone.position.y = -5 * Math.cos(rad);
 
