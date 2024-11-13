@@ -90,7 +90,7 @@ const Page = () => {
 
       // Geometry를 bone 구조에 맞게 생성 (높이 10으로 수정)
       const geometry = new THREE.CylinderGeometry(0.5, 0.5, 10, 32);
-      // geometry.translate(0, , 0); // cylinder를 bone 위치에 맞게 조정
+      geometry.translate(0, 0, 0); // cylinder를 bone 위치에 맞게 조정
 
       const material = new THREE.MeshBasicMaterial({
         color: 0x00ff00,
@@ -114,14 +114,19 @@ const Page = () => {
         vertex.fromBufferAttribute(position, i);
         const y = vertex.y; // -5에서 5 사이의 값
 
-        if (y < 0) {
-          // 하단부 (0 ~ -5): midBone과 endBone의 영향
-          const influence = (y + 5) / 5; // -5~0 범위를 0~1로 변환
+        if (y < -2.5) {
+          // Bottom third: primarily influenced by endBone
+          const influence = (y + 5) / 2.5; // -5 to -2.5 range to 0-1
+          skinIndices.push(2, 1, 0, 0); // Changed order: endBone(2) has primary influence
+          skinWeights.push(1 - influence, influence, 0, 0);
+        } else if (y < 2.5) {
+          // Middle section: primarily influenced by midBone
+          const influence = (y + 2.5) / 5; // -2.5 to 2.5 range to 0-1
           skinIndices.push(1, 2, 0, 0);
           skinWeights.push(1 - influence, influence, 0, 0);
         } else {
-          // 상단부 (0 ~ 5): rootBone과 midBone의 영향
-          const influence = y / 5; // 0~5 범위를 0~1로 변환
+          // Top third: primarily influenced by rootBone and midBone
+          const influence = (y - 2.5) / 2.5; // 2.5 to 5 range to 0-1
           skinIndices.push(0, 1, 0, 0);
           skinWeights.push(1 - influence, influence, 0, 0);
         }
@@ -140,26 +145,38 @@ const Page = () => {
       // 중요: 본 계층구조를 먼저 씬에 추가
       scene.add(rootBone);
 
-      // SkinnedMesh를 씬에 추가
+      // First add the bone hierarchy to the mesh
       skinnedMesh.add(rootBone);
+      // Then bind the skeleton
       skinnedMesh.bind(skeleton);
+      // Finally add the mesh to the scene
       scene.add(skinnedMesh);
 
       // 스켈레톤 헬퍼는 마지막에 추가
 
+      let rad = 0;
+      let direction = true;
       const animate = () => {
         controls.update();
         id = requestAnimationFrame(animate);
 
-        const time = Date.now() * 0.001;
+        rootBone.rotation.z = rad;
+        midBone.position.x = 0;
+        midBone.position.y = -5;
+        endBone.position.x = -5 * Math.sin(rad);
+        endBone.position.y = -5 * Math.cos(rad);
 
-        rootBone.rotation.z = Math.abs(Math.sin(time));
-        midBone.position.x = Math.sin(time) / 2;
-        midBone.position.y = -5 + (2 * Math.sin(time)) / 2;
+        if (direction) {
+          rad += 0.01;
+        } else {
+          rad -= 0.01;
+        }
 
-        endBone.position.x = -5 * Math.abs(Math.sin(time));
-        endBone.position.y = -5 + 2 * Math.abs(Math.sin(time));
-
+        if (rad > Math.PI / 4) {
+          direction = false;
+        } else if (rad < 0) {
+          direction = true;
+        }
         renderer.render(scene, camera);
       };
 
